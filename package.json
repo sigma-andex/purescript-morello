@@ -1,0 +1,17 @@
+{
+  "name": "purescript-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "purescript": "^0.13.8",
+    "purty": "^6.3.0",
+    "spago": "^0.19.0"
+  }
+}
