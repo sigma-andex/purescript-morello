@@ -105,7 +105,7 @@ type PersonB = { title :: String }
 
 
 --convert :: Person -> Validated PersonB
-convert :: Person -> Validated PersonB
+--convert :: Person -> Validated PersonB
 convert = branch >>>
       cherry {
             title : titleValidator

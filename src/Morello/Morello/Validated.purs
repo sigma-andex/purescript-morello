@@ -31,5 +31,6 @@ valid = pure
 
 newtype Validator input a = Validator (input -> Validated a)
 
+
 applyValidator :: forall input a. input -> Validator input a -> Validated a
 applyValidator input (Validator v) = v input
