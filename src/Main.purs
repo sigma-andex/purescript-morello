@@ -34,6 +34,8 @@ import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import Heterogeneous.Folding (class FoldingWithIndex, class FoldlRecord, class HFoldl, class HFoldlWithIndex, hfoldlWithIndex)
+import Morello.Morello.Core (blossom, branch, cherry)
+import Morello.Validated (Validated, ValidationError, Validator(..), valid)
 import Prim.Row (class Nub, class Union, class Lacks, class Cons)
 import Prim.Row as Row
 import Prim.RowList (class RowToList, kind RowList)
@@ -53,7 +55,7 @@ type Person
         }
     }
 
--- x :: Person
+x :: Person
 x =
   { person:
       { addresses:
@@ -80,39 +82,6 @@ titleL = prop (SProxy :: SProxy "title")
 
 addresses = personL <<< addressesL <<< traversed
 
-data ValidationError
-  = ZipIsEmpty
-  | ZipInvalid
-  | TitleMissing
-  | TitleInvalid
-
-derive instance genericValidationError :: Generic ValidationError _
-
-instance showValidationError :: Show ValidationError where
-  show = genericShow
-
-validateNonEmpty :: String -> V (NonEmptyArray ValidationError) String
-validateNonEmpty input
-  | null input = V.invalid $ NonEmpty.singleton ZipIsEmpty
-  | otherwise = pure input
-
-validateZip :: String -> V (NonEmptyArray ValidationError) Int
-validateZip input = case fromString input of
-  Just i -> pure i
-  Nothing -> V.invalid (NonEmpty.singleton ZipInvalid)
-
-validateForm ::
-  String ->
-  V (NonEmptyArray ValidationError) Int
-validateForm zip = validateNonEmpty zip *> validateZip zip
-
-maybeToV :: forall a. ValidationError -> Maybe a -> V (NonEmptyArray ValidationError) a
-maybeToV _ (Just v) = pure v
-
-maybeToV err Nothing = V.invalid (NonEmpty.singleton err)
-
-type Validated r
-  = V (NonEmptyArray ValidationError) r
 
 type PersonX
   = { person ::
@@ -129,121 +98,33 @@ type PersonX
 type TitleX
   = { title :: String }
 
-type Validator a b
-  = a -> Validated b
+titleValidator :: Validator Person String
+titleValidator = Validator (view (professionL <<< titleL) >>> valid)
 
--- asValidated :: forall a b. Monoid a => Validator a b -> Prism' a (Validated a)
--- asValidated validate = prism' backward forward 
---   where 
---     backward = mempty
---     forward = pure <<< validate 
-valid = pure
-
-asValid :: forall a. Prism' (Validated a) a
-asValid =
-  prism' valid case _ of
-    V (Left err) -> Nothing
-    V (Right v) -> Just v
-
-validate :: forall t29 t30 t31 t32 t33. (Star t33 t30 t29 -> Star t33 t32 t31) -> (t30 -> t33 t29) -> t32 -> t33 t31
-validate = traverseOf
-
-validTitle :: Validator String String
-validTitle s@"Software Engineer" = pure s
-
-validTitle e = V.invalid $ NonEmpty.singleton TitleInvalid
-
-branch :: forall input. input -> Tuple input (Validated {})
-branch = identity &&& const (valid {})
-
-infixr 8 branch as 🌱
-
-cherry :: forall input from to' to. 
-  Union from to' to ⇒ 
-  (input -> Validated { | to' } ) -> 
-  Tuple input (Validated { | from }) -> 
-  Tuple input (Validated { | to })
-cherry f = fst &&& transform f
-  where
-  
-    transform :: (input -> Validated { | to' }) -> Tuple input (Validated { | from }) -> (Validated { | to })
-    transform f' tuple = Tuple <$> snd tuple <*> (f' (fst tuple)) <#> uncurry union
-
-infixr 8 cherry as 🍒
-
-blossom :: forall input output. Tuple input (Validated output) -> Validated output
-blossom = snd
-
-infixr 8 blossom as 🌸
-
-data ShowProps = ShowProps
-
--- instance showProps ::
---   (Show a, 
---   IsSymbol sym,
---   Lacks sym (),
---   Cons sym String () whatever,
---   Union whatever input output
---   ) =>
---   FoldingWithIndex ShowProps (SProxy sym) { | input } a { | output } where
---   foldingWithIndex ShowProps prop pre a =
---     Tuple (insert prop ("fck-yeah-" <> show a) {}) pre # uncurry union
-
--- pick :: forall t77 t78. HFoldlWithIndex ShowProps (Record ()) t77 t78 => t77 -> t78
--- pick r =
---   hfoldlWithIndex ShowProps {} r
-
-instance showProps ::
-  (--Show a, 
-  IsSymbol sym,
-  Lacks sym (),
-  Cons sym { | a } () whatever,
-  RowToList a aRL,
-  FoldlRecord ShowProps {} aRL a { | a },
-  Union whatever input output
-  ) =>
-  FoldingWithIndex ShowProps (SProxy sym) { | input } { | a }  { | output } where
-  foldingWithIndex ShowProps prop pre a =
-    Tuple (insert prop (spy "a" $ hfoldlWithIndex ShowProps {} a) {}) (spy "pre" pre) # uncurry union
-
-instance showPropsS ::
-  (--Show a, 
-  IsSymbol sym,
-  Lacks sym (),
-  Cons sym String () whatever,
-  Union whatever input output
-  ) =>
-  FoldingWithIndex ShowProps (SProxy sym) { | input } String  { | output } where
-  foldingWithIndex ShowProps prop pre a =
-    Tuple (insert prop ("fck-yeah-" <> (spy "a" $ a)) {}) (spy "pre" pre) # uncurry union
-
-pick :: forall input output. HFoldlWithIndex ShowProps {} { | input } { | output } => { | input }  -> { | output }
-pick r =
-  hfoldlWithIndex ShowProps {} r
+type PersonB = { title :: String }
 
 
-invalid = NonEmpty.singleton >>> V.invalid
-
+--convert :: Person -> Validated PersonB
+convert :: Person -> Validated PersonB
 convert = branch >>>
-  cherry (\_ -> valid { firstName : "Hans" }) >>>
-  cherry (\_ -> invalid ZipInvalid :: Validated { zip:: String}) >>> 
-  cherry (validate (professionL <<< titleL) validTitle) >>>
-  cherry (\_ -> invalid TitleInvalid :: Validated { title:: String}) >>> 
-  blossom
+      cherry {
+            title : titleValidator
+          } >>>
+      blossom
 
+      
 -- purescript-morello
 
-convert2 = 
-  (🌱) >>>
-  (🍒) (\_ -> valid { firstName : "Hans" }) >>>
-  (🍒) (\_ -> invalid ZipInvalid :: Validated { zip :: String}) >>> 
-  (🍒) (validate (professionL <<< titleL) validTitle) >>>
-  (🍒) (\_ -> invalid TitleInvalid :: Validated { title :: String}) >>> 
-  (🌸)
+-- convert2 = 
+--   (🌱) >>>
+--   (🍒) (\_ -> valid { firstName : "Hans" }) >>>
+--   (🍒) (\_ -> invalid ZipInvalid :: Validated { zip :: String}) >>> 
+--   (🍒) (validate (professionL <<< titleL) validTitle) >>>
+--   (🍒) (\_ -> invalid TitleInvalid :: Validated { title :: String}) >>> 
+--   (🌸)
 
 main :: Effect Unit
 main = do
-  logShow $ (convert2 x)
-  let
-    _ = spy "record" $ pick { a: { b : "foo" } , b: "42" , c: "false", d : { e : "hans", f: "23"} }
-  logShow $ ""
+  let 
+    _ = spy "bla" (convert x)
+  log ""

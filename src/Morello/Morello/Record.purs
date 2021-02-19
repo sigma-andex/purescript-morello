@@ -181,7 +181,7 @@ else instance mappingPropOfK_3 ::
   foldingWithIndex _ prop rin x = (rin >>> Builder.insert prop x) # spy "mk3"
 
 mappingPropsOfK ::
-  forall f g a rin rout.
+  forall f g rin rout.
   HFoldlWithIndex (MappingPropOfK f g) (Builder {} {}) { | rin } (Builder {} { | rout }) =>
   (f ~> g) ->
   { | rin } ->
