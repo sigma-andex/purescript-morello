@@ -2,7 +2,6 @@ module Morello.Morello.Record where
 
 import Prelude
 import Data.Symbol (class IsSymbol, SProxy)
-import Debug.Trace (spy)
 import Heterogeneous.Folding (class FoldingWithIndex, class FoldlRecord, class HFoldlWithIndex, hfoldlWithIndex)
 import Prim.Row as Row
 import Prim.RowList (class RowToList)
@@ -24,7 +23,7 @@ instance sequencePropOf_1 ::
     (f (Builder { | ra } { | rb }))
     (f a)
     (f (Builder { | ra } { | rc })) where
-  foldingWithIndex _ prop rin a = (>>>) <$> rin <*> (Builder.insert prop <$> a) # spy "s1"
+  foldingWithIndex _ prop rin a = (>>>) <$> rin <*> (Builder.insert prop <$> a)
 else instance sequencePropOf_2 ::
   ( Applicative f
   , IsSymbol sym
@@ -44,7 +43,7 @@ else instance sequencePropOf_2 ::
     (f (Builder { | ra } { | rb }))
     { | x }
     (f (Builder { | ra } { | rc })) where
-  foldingWithIndex _ prop rin x = (>>>) <$> rin <*> (fx <#> Builder.insert prop) # spy "s2"
+  foldingWithIndex _ prop rin x = (>>>) <$> rin <*> (fx <#> Builder.insert prop)
     where
     fx = sequencePropsOf x
 else instance sequencePropOf_3 ::
@@ -59,8 +58,7 @@ else instance sequencePropOf_3 ::
     (f (Builder { | ra } { | rb }))
     x
     (f (Builder { | ra } { | rc })) where
-  foldingWithIndex _ prop rin x = (_ >>> Builder.insert prop x) <$> rin # spy "s3"
-
+  foldingWithIndex _ prop rin x = (_ >>> Builder.insert prop x) <$> rin
 
 sequencePropsOf ::
   forall f rin rout.
@@ -86,7 +84,7 @@ instance mappingPropOf_1 ::
     (Builder { | ra } { | rb })
     a
     (Builder { | ra } { | rc }) where
-  foldingWithIndex (MappingPropOf f) prop rin a = (rin >>> Builder.insert prop (f a)) # spy "m1"
+  foldingWithIndex (MappingPropOf f) prop rin a = (rin >>> Builder.insert prop (f a))
 else instance mappingPropOf_2 ::
   ( IsSymbol sym
   , Row.Lacks sym rb
@@ -105,7 +103,7 @@ else instance mappingPropOf_2 ::
     (Builder { | ra } { | rb })
     { | x }
     (Builder { | ra } { | rc }) where
-  foldingWithIndex (MappingPropOf f) prop rin x = (rin >>> Builder.insert prop fx) # spy "m2"
+  foldingWithIndex (MappingPropOf f) prop rin x = (rin >>> Builder.insert prop fx)
     where
     fx = mappingPropsOf f x
 else instance mappingPropOf_3 ::
@@ -119,10 +117,10 @@ else instance mappingPropOf_3 ::
     (Builder { | ra } { | rb })
     x
     (Builder { | ra } { | rc }) where
-  foldingWithIndex _ prop rin x = (rin >>> Builder.insert prop x) # spy "m3"
+  foldingWithIndex _ prop rin x = (rin >>> Builder.insert prop x)
 
 mappingPropsOf ::
-  forall f a b rin rout.
+  forall a b rin rout.
   HFoldlWithIndex (MappingPropOf a b) (Builder {} {}) { | rin } (Builder {} { | rout }) =>
   (a -> b) ->
   { | rin } ->
@@ -145,7 +143,7 @@ instance mappingPropOfK_1 ::
     (Builder { | ra } { | rb })
     (f a)
     (Builder { | ra } { | rc }) where
-  foldingWithIndex (MappingPropOfK nt) prop rin fa = (rin >>> Builder.insert prop (nt fa)) # spy "mk1"
+  foldingWithIndex (MappingPropOfK nt) prop rin fa = (rin >>> Builder.insert prop (nt fa))
 else instance mappingPropOfK_2 ::
   ( IsSymbol sym
   , Row.Lacks sym rb
@@ -164,7 +162,7 @@ else instance mappingPropOfK_2 ::
     (Builder { | ra } { | rb })
     { | x }
     (Builder { | ra } { | rc }) where
-  foldingWithIndex (MappingPropOfK nt) prop rin x = (rin >>> Builder.insert prop fx) # spy "mk2"
+  foldingWithIndex (MappingPropOfK nt) prop rin x = (rin >>> Builder.insert prop fx)
     where
     fx = mappingPropsOfK nt x
 else instance mappingPropOfK_3 ::
@@ -178,7 +176,7 @@ else instance mappingPropOfK_3 ::
     (Builder { | ra } { | rb })
     x
     (Builder { | ra } { | rc }) where
-  foldingWithIndex _ prop rin x = (rin >>> Builder.insert prop x) # spy "mk3"
+  foldingWithIndex _ prop rin x = (rin >>> Builder.insert prop x)
 
 mappingPropsOfK ::
   forall f g rin rout.
