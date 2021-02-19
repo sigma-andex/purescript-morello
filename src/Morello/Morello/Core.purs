@@ -5,11 +5,10 @@ import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Profunctor.Strong ((&&&))
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V)
-import Debug.Trace (spy)
-import Heterogeneous.Folding (class FoldlRecord, class HFoldlWithIndex)
+import Heterogeneous.Folding (class FoldlRecord)
 import Morello.Morello.Record (MappingPropOfK, SequencePropOf, mappingPropsOfK, sequencePropsOf)
 import Morello.Validated (Validated, ValidationError, Validator, applyValidator, valid)
-import Prelude (type (~>), const, identity, (#), ($), (<#>), (<$>), (<*>), (>>>))
+import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
 import Prim.Row (class Union)
 import Prim.RowList (class RowToList)
 import Record (union)
@@ -31,15 +30,6 @@ dual f = fst &&& transform f
   transform :: (input -> Validated { | to' }) -> Tuple input (Validated { | from }) -> (Validated { | to })
   transform f' tuple = Tuple <$> snd tuple <*> (f' (fst tuple)) <#> uncurry union
 
--- applyTemplate ::
---   ∀ input rin rinRL rout routRL.
---   HFoldlWithIndex (MappingPropOfK (Validator input) (V (NonEmptyArray ValidationError))) (Builder {} {}) { | rin }  (Builder {} { | rout } ) ⇒
---   RowToList rin rinRL =>
---   RowToList rout routRL =>
---     HFoldlWithIndex (SequencePropOf (V (NonEmptyArray ValidationError))) (V (NonEmptyArray ValidationError) (Builder {} {})) { | rin } (V (NonEmptyArray ValidationError) (Builder {} { | rout })) =>
---   { | rin } →
---   input ->
---   Validated { | rout }
 applyTemplate ::
   forall input rin rinRL rthru rthruRL rout routRL.
   RowToList rin rinRL =>
@@ -57,7 +47,7 @@ applyTemplate ::
     rthruRL
     rthru
     (V (NonEmptyArray ValidationError) (Builder (Record ()) (Record rout))) =>
-  (Validator input ~> Validated) -> { | rin } ->  Validated { | rout }
+  (Validator input ~> Validated) -> { | rin } -> Validated { | rout }
 applyTemplate nt = mappingPropsOfK nt >>> sequencePropsOf
 
 cherry ::
