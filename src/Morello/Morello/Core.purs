@@ -56,11 +56,9 @@ applyTemplate :: forall input rin rinRL rout routRL.
                                       routRL
                                       rout
                                       (V (NonEmptyArray ValidationError) (Builder (Record ()) (Record rout))) =>                            
-    { | rin } -> input -> Validated { | rout }
-applyTemplate rin input = mappingPropsOfK nt ( spy "before mapping" rin) # spy "after mapping" # sequencePropsOf
-    where
-      nt :: Validator input ~> Validated
-      nt = (spy "validator" $ applyValidator input)
+    { | rin } -> (Validator input ~> Validated) -> Validated { | rout }
+applyTemplate rin nt = mappingPropsOfK nt ( spy "before mapping" rin) # spy "after mapping" # sequencePropsOf
+   
 
 cherry ::
   forall input from to rin rinRL rout routRL .
@@ -86,7 +84,7 @@ cherry ::
 cherry rin = dual f
     where
         f :: input -> Validated { | rout }
-        f = applyTemplate rin
+        f input = applyTemplate rin (applyValidator input)
 
 infixr 8 cherry as 🍒
 
