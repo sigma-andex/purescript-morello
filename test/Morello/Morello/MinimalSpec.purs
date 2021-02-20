@@ -1,9 +1,8 @@
 module Morello.Morello.MinimalSpec where
 
-import Morello.Morello
-import Prelude
+import Morello.Morello 
+import Prelude 
 
-import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NonEmpty
 import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
@@ -11,7 +10,6 @@ import Data.Generic.Rep.Show (genericShow)
 import Data.Lens.Record (prop)
 import Data.Newtype (class Newtype)
 import Data.Validation.Semigroup (V(..))
-import Effect.Class.Console (logShow)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Type.Proxy (Proxy(..))
@@ -60,15 +58,16 @@ pickV = pickP (Proxy :: Proxy PersonInput)
 -- define your convert function
 convert :: PersonInput -> Validated PersonOutput
 convert =
-  branch
-    >>> cherry { 
-            details : {
+  branch -- start with a branch
+    >>> cherry { -- then start cherry picking
+            details : { -- by defining how your output format should look like
                 title: 
+                    -- then pick data from your input and validate them 
                     pickV (professionL |> titleL |> validateOverL Title titleValidator)
-            , salary:
+              , salary:
                     pickV (professionL |> salaryL |> validateOverL Salary salaryValidator)
-                    
-            , jobType : Worker
+              -- you can also set constant data
+              , jobType : Worker
             }
         }
     >>> blossom

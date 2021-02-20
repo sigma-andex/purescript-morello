@@ -4,7 +4,7 @@ A purescript library for cherry-picking 🍒 your data.
 
 The goal of this library is to make it super simple to validate input data and transform it into output data.
 
-## tl;dr
+## Quick start
 
 ```purescript
 import Prelude
@@ -53,22 +53,23 @@ salaryValidator n = invalid (FieldInvalid "Salary is too damn low")
 -- some necessary type information
 pickV = pickP (Proxy :: Proxy PersonInput)
 
-
--- define your convert function
+-- now let's start converting! 
 convert :: PersonInput -> Validated PersonOutput
 convert =
-  branch
-    >>> cherry { 
-            details : {
+  branch -- start with a branch
+    >>> cherry { -- then start cherry picking
+            details : { -- by defining how your output format should look like
                 title: 
+                    -- then pick data from your input by zooming in using the lens...
                     pickV (professionL |> titleL |> validateOverL Title titleValidator)
-            , salary:
+              , salary:
+                    -- ...and validate using your validator
                     pickV (professionL |> salaryL |> validateOverL Salary salaryValidator)
-                    
-            , jobType : Worker
+              -- you can also set constant data
+              , jobType : Worker
             }
         }
-    >>> blossom
+    >>> blossom -- finish up
 
 -- convert your data
 invalidPerson :: PersonInput
