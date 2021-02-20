@@ -70,6 +70,8 @@ spec =
             , h: 10
             }
         (sequencePropsOf input) `shouldEqual` Nothing
+
+    describe "mappingPropsOf" do
       it "should recursively map a function over a record" do
         let
           input :: MapInput
@@ -99,6 +101,7 @@ spec =
             , i: "41"
             }
         (mappingPropsOf f input) `shouldEqual` expected
+    describe "mappingPropsOKf" do
       it "should recursively mapK a natural transformation over a record" do
         let
           input :: MapKInput
