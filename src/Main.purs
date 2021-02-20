@@ -1,15 +1,19 @@
 module Main where
 
+import Prelude
+
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import Data.Lens (traversed)
-import Data.Lens.Getter (view)
 import Data.Lens.Record (prop)
+import Data.Newtype (class Newtype)
 import Data.Symbol (SProxy(..))
-import Debug.Trace (spy)
 import Effect (Effect)
+import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import Morello.Morello.Core (blossom, branch, cherry, (🌱), (🌸), (🍒))
-import Morello.Validated (Validated, ValidationError(..), Validator(..), invalid, valid)
-import Prelude (Unit, (<<<), (>), (>>>))
+import Morello.Morello.Core (blossom, branch, cherry, key, pickP, validateL, validateOverL, (|>), (🌱), (🌸), (🍒))
+import Morello.Validated (Validate, Validated, ValidationError(..), invalid, valid)
+import Type.Prelude (Proxy(..))
 
 type PersonInput
   = { person ::
@@ -23,6 +27,43 @@ type PersonInput
         , salary :: Number
         }
     }
+
+
+type PersonOutput
+  = { title :: String, salary :: Number }
+
+
+newtype Title
+  = Title String
+
+derive instance titleNT :: Newtype Title _
+
+derive instance titleGen :: Generic Title _
+
+instance titleShow :: Show Title where
+  show = genericShow
+
+newtype Salary
+  = Salary Number
+
+derive instance salaryNT :: Newtype Salary _
+
+derive instance salaryGen :: Generic Salary _
+
+instance salaryShow :: Show Salary where
+  show = genericShow
+
+data JobType
+  = Worker
+  | Manager
+
+derive instance jobTypeGen :: Generic JobType _
+
+instance jobTypeShow :: Show JobType where
+  show = genericShow
+
+type PersonOutput2
+  = { details :: { title :: Title, salary :: Salary, jobType :: JobType } }
 
 invalidPerson :: PersonInput
 invalidPerson =
@@ -56,67 +97,79 @@ validPerson =
       }
   }
 
-personL = prop (SProxy :: SProxy "person")
+personL = prop (key :: _ "person")
 
-addressesL = prop (SProxy :: SProxy "addresses")
+addressesL = prop (key :: _ "addresses")
 
-zipL = prop (SProxy :: SProxy "zip")
+zipL = prop (key :: _ "zip")
 
-professionL = prop (SProxy :: SProxy "profession")
+professionL = prop (key :: _ "profession")
 
-titleL = prop (SProxy :: SProxy "title")
+titleL = prop (key :: _ "title")
 
-salaryL = prop (SProxy :: SProxy "salary")
+salaryL = prop (key :: _ "salary")
 
 addresses = personL <<< addressesL <<< traversed
 
-titleValidator :: Validator PersonInput String
-titleValidator = Validator (view (professionL <<< titleL) >>> f)
-  where
-    f :: String -> Validated String 
-    f "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
-    f s = valid s 
-
-salaryValidator :: Validator PersonInput Number
-salaryValidator = Validator (view (professionL <<< salaryL) >>> f)
-  where
-    f :: Number -> Validated Number
-    f n | n > 150000.0 = valid n
-    f n = invalid (FieldInvalid "Salary is too low")
 
 
-type PersonOutput
-  = { title :: String, salary :: Number }
+titleValidator :: Validate String
+titleValidator "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
+
+titleValidator s = valid s
+
+salaryValidator :: Validate Number
+salaryValidator n
+  | n > 150000.0 = valid n
+
+salaryValidator n = invalid (FieldInvalid "Salary is too low")
+
+
+pickV = pickP (Proxy :: Proxy PersonInput)
+
+
 
 convert :: PersonInput -> Validated PersonOutput
 convert =
   branch
-    >>> cherry { title: titleValidator }
-    >>> cherry { salary: salaryValidator }
+    >>> cherry
+        { title:
+            pickV (professionL |> titleL |> validateL titleValidator)
+        , salary:
+            pickV (professionL |> salaryL |> validateL salaryValidator)
+        }
     >>> blossom
+
 
 convert2 :: PersonInput -> Validated PersonOutput
 convert2 =
   (🌱)
-    >>> (🍒) { title: titleValidator }
-    >>> (🍒) { salary: salaryValidator }
+    >>> (🍒) { title: pickV (professionL |> titleL |> validateL titleValidator) }
+    >>> (🍒) { salary: pickV (professionL |> salaryL |> validateL salaryValidator) }
     >>> (🌸)
 
-convert3 :: PersonInput -> Validated PersonOutput
+
+
+convert3 :: PersonInput -> Validated PersonOutput2
 convert3 =
   branch
-    >>> cherry { title: titleValidator, salary: salaryValidator }
+    >>> cherry
+        { details:
+            { title: pickV (professionL |> titleL |> validateOverL Title titleValidator) 
+            , salary: pickV (professionL |> salaryL |> validateOverL Salary salaryValidator) 
+            , jobType: Worker
+            }
+        }
     >>> blossom
 
 main :: Effect Unit
 main = do
-  let
-    _ = spy "convert" (convert invalidPerson)
-    _ = spy "convert" (convert validPerson)
-
-    _ = spy "convert2" (convert2 invalidPerson)
-    _ = spy "convert2" (convert2 validPerson)
-
-    _ = spy "convert3" (convert3 invalidPerson)
-    _ = spy "convert3" (convert3 validPerson)
-  log ""
+  log "\n----example 1----\n"
+  logShow $ convert invalidPerson
+  logShow $ convert validPerson
+  log "\n----example 2----\n"
+  logShow $ convert2 invalidPerson
+  logShow $ convert2 validPerson
+  log "\n----example 3----\n"
+  logShow $ convert3 invalidPerson
+  logShow $ convert3 validPerson

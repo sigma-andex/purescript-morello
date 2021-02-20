@@ -1,8 +1,6 @@
 module Morello.Validated where
 
-
 import Prelude
-
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NonEmpty
 import Data.Generic.Rep (class Generic)
@@ -28,9 +26,11 @@ invalid = NonEmpty.singleton >>> V.invalid
 valid :: forall err r. r -> V (NonEmptyArray err) r
 valid = pure
 
-
-newtype Validator input a = Validator (input -> Validated a)
-
+newtype Validator input a
+  = Validator (input -> Validated a)
 
 applyValidator :: forall input a. input -> Validator input a -> Validated a
 applyValidator input (Validator v) = v input
+
+type Validate a
+  = a -> Validated a

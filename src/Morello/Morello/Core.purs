@@ -2,17 +2,23 @@ module Morello.Morello.Core where
 
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
+import Data.Either (Either(..))
+import Data.Lens (AGetter', Lens', Iso', iso, lens', view)
+import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Profunctor (class Profunctor)
 import Data.Profunctor.Strong ((&&&))
+import Data.Symbol (SProxy(..))
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
-import Data.Validation.Semigroup (V)
+import Data.Validation.Semigroup (V(..))
 import Heterogeneous.Folding (class FoldlRecord)
 import Morello.Morello.Record (MappingPropOfK, SequencePropOf, mappingPropsOfK, sequencePropsOf)
-import Morello.Validated (Validated, ValidationError, Validator, applyValidator, valid)
+import Morello.Validated (Validated, ValidationError, Validator(..), Validate, applyValidator, valid)
 import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
 import Prim.Row (class Union)
 import Prim.RowList (class RowToList)
 import Record (union)
 import Record.Builder (Builder)
+import Type.Prelude (Proxy(..))
 
 branch :: forall input. input -> Tuple input (Validated {})
 branch = identity &&& const (valid {})
@@ -83,4 +89,44 @@ blossom = snd
 
 infixr 8 blossom as 🌸
 
+asIs :: forall p t2 t3. Profunctor p => p t2 t3 -> p t2 t3
+asIs = iso identity identity
+
+as :: forall s a. Newtype s a => (a -> s) -> Iso' a s 
+as _ = iso wrap unwrap
+
+as' :: forall s a. Newtype s a => Iso' a s 
+as' = iso wrap unwrap
+
+validateL :: forall a. Validate a -> Lens' a (Validated a)
+validateL validated = 
+  lens' \field ->
+    Tuple
+      (validated field) 
+      (\b -> case b of
+        V (Left err) -> field
+        V (Right v) -> v 
+      )
+
+validateOverL :: forall n a. Newtype n a => (a -> n) -> Validate a -> Lens' a (Validated n)
+validateOverL _ validated = 
+    lens' \field ->
+        Tuple
+        (validated field <#> wrap) 
+        (\b -> case b of
+            V (Left err) -> field
+            V (Right v) -> unwrap v 
+        )
+
 infixr 9 compose as |>
+
+pick :: forall s a. AGetter' s (Validated a) -> Validator s a
+pick lens = Validator (view lens)
+
+pickP :: forall s a. Proxy s -> AGetter' s (Validated a) -> Validator s a
+pickP _ lens = Validator (view lens)
+
+type Key r = SProxy r
+
+key :: forall r. Key r
+key = SProxy
