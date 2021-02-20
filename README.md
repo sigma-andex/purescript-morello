@@ -1,6 +1,6 @@
 # purescript-morello 🌸
 
-A purescript library for 🍒-picking data.
+A purescript library for chery-picking 🍒 your data.
 
 
 
