@@ -89,11 +89,11 @@ validPerson =
       }
   }
 
+first :: Validated PersonOutput
 first = convert invalidPerson
--- invalid ((NonEmptyArray [(FieldInvalid "Salary is too damn low"),(FieldInvalid "Software Engineering is not a serious profession")]))
 
+second :: Validated PersonOutput
 second = convert validPerson
--- pure ({ details: { jobType: Worker, salary: (Salary 200000.0), title: (Title "Pilot") } })
 
 instance salaryShow :: Show Salary where
   show = genericShow
