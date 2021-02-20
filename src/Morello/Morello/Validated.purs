@@ -1,4 +1,4 @@
-module Morello.Validated where
+module Morello.Morello.Validated where
 
 import Prelude
 import Data.Array.NonEmpty (NonEmptyArray)

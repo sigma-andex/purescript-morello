@@ -1,18 +1,14 @@
 module Main where
 
 import Prelude
-
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.Lens (traversed)
 import Data.Lens.Record (prop)
 import Data.Newtype (class Newtype)
-import Data.Symbol (SProxy(..))
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import Morello.Morello.Core (blossom, branch, cherry, key, pickP, validateL, validateOverL, (|>), (🌱), (🌸), (🍒))
-import Morello.Validated (Validate, Validated, ValidationError(..), invalid, valid)
+import Morello.Morello (blossom, branch, cherry, key, pickP, validateL, validateOverL, (|>), (🌱), (🌸), (🍒), Validate, Validated, ValidationError(..), invalid, valid)
 import Type.Prelude (Proxy(..))
 
 type PersonInput
@@ -28,10 +24,8 @@ type PersonInput
         }
     }
 
-
 type PersonOutput
   = { title :: String, salary :: Number }
-
 
 newtype Title
   = Title String
@@ -99,19 +93,11 @@ validPerson =
 
 personL = prop (key :: _ "person")
 
-addressesL = prop (key :: _ "addresses")
-
-zipL = prop (key :: _ "zip")
-
 professionL = prop (key :: _ "profession")
 
 titleL = prop (key :: _ "title")
 
 salaryL = prop (key :: _ "salary")
-
-addresses = personL <<< addressesL <<< traversed
-
-
 
 titleValidator :: Validate String
 titleValidator "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
@@ -124,10 +110,7 @@ salaryValidator n
 
 salaryValidator n = invalid (FieldInvalid "Salary is too low")
 
-
 pickV = pickP (Proxy :: Proxy PersonInput)
-
-
 
 convert :: PersonInput -> Validated PersonOutput
 convert =
@@ -140,7 +123,6 @@ convert =
         }
     >>> blossom
 
-
 convert2 :: PersonInput -> Validated PersonOutput
 convert2 =
   (🌱)
@@ -148,15 +130,13 @@ convert2 =
     >>> (🍒) { salary: pickV (professionL |> salaryL |> validateL salaryValidator) }
     >>> (🌸)
 
-
-
 convert3 :: PersonInput -> Validated PersonOutput2
 convert3 =
   branch
     >>> cherry
         { details:
-            { title: pickV (professionL |> titleL |> validateOverL Title titleValidator) 
-            , salary: pickV (professionL |> salaryL |> validateOverL Salary salaryValidator) 
+            { title: pickV (professionL |> titleL |> validateOverL Title titleValidator)
+            , salary: pickV (professionL |> salaryL |> validateOverL Salary salaryValidator)
             , jobType: Worker
             }
         }
