@@ -11,7 +11,7 @@ import Data.Symbol (SProxy(..))
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V(..))
 import Heterogeneous.Folding (class FoldlRecord)
-import Morello.Morello.Record (MappingPropOfK, SequencePropOf, mappingPropsOfK, sequencePropsOf)
+import Morello.Morello.Record (HMapKRec, SequenceRec, hmapKRec, sequenceRec)
 import Morello.Morello.Validated (Validated, ValidationError, Validator(..), Validate, applyValidator, valid)
 import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
 import Prim.Row (class Union)
@@ -42,19 +42,19 @@ applyTemplate ::
   RowToList rthru rthruRL =>
   RowToList rout routRL =>
   FoldlRecord
-    (MappingPropOfK (Validator input) (V (NonEmptyArray ValidationError)))
+    (HMapKRec (Validator input) (V (NonEmptyArray ValidationError)))
     (Builder (Record ()) (Record ()))
     rinRL
     rin
     (Builder (Record ()) (Record rthru)) =>
   FoldlRecord
-    (SequencePropOf (V (NonEmptyArray ValidationError)))
+    (SequenceRec (V (NonEmptyArray ValidationError)))
     (V (NonEmptyArray ValidationError) (Builder (Record ()) (Record ())))
     rthruRL
     rthru
     (V (NonEmptyArray ValidationError) (Builder (Record ()) (Record rout))) =>
   (Validator input ~> Validated) -> { | rin } -> Validated { | rout }
-applyTemplate nt = mappingPropsOfK nt >>> sequencePropsOf
+applyTemplate nt = hmapKRec nt >>> sequenceRec
 
 cherry ::
   forall input from to rin rinRL rthru rthruRL rout routRL.
@@ -62,13 +62,13 @@ cherry ::
   RowToList rthru rthruRL =>
   RowToList rout routRL =>
   FoldlRecord
-    (MappingPropOfK (Validator input) (V (NonEmptyArray ValidationError)))
+    (HMapKRec (Validator input) (V (NonEmptyArray ValidationError)))
     (Builder (Record ()) (Record ()))
     rinRL
     rin
     (Builder (Record ()) (Record rthru)) =>
   FoldlRecord
-    (SequencePropOf (V (NonEmptyArray ValidationError)))
+    (SequenceRec (V (NonEmptyArray ValidationError)))
     (V (NonEmptyArray ValidationError) (Builder (Record ()) (Record ())))
     rthruRL
     rthru

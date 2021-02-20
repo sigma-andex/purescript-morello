@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Either (Either(..), hush)
 import Data.Maybe (Maybe(..))
-import Morello.Morello.Record (mappingPropsOf, mappingPropsOfK, sequencePropsOf)
+import Morello.Morello.Record (hmapRec, hmapKRec, sequenceRec)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
@@ -29,7 +29,7 @@ type MapKOutput
 spec :: Spec Unit
 spec =
   describe "Morello.Morello.Record" do
-    describe "sequencePropsOf" do
+    describe "sequenceRec" do
       it "should recursively sequence a valid record" do
         let
           input :: SequenceInput
@@ -55,7 +55,7 @@ spec =
                 }
             , h: 10
             }
-        (sequencePropsOf input) `shouldEqual` (Just expected)
+        (sequenceRec input) `shouldEqual` (Just expected)
       it "should recursively sequence an invalid record" do
         let
           input :: SequenceInput
@@ -69,9 +69,9 @@ spec =
                 }
             , h: 10
             }
-        (sequencePropsOf input) `shouldEqual` Nothing
+        (sequenceRec input) `shouldEqual` Nothing
 
-    describe "mappingPropsOf" do
+    describe "hmapRec" do
       it "should recursively map a function over a record" do
         let
           input :: MapInput
@@ -100,8 +100,8 @@ spec =
                 }
             , i: "41"
             }
-        (mappingPropsOf f input) `shouldEqual` expected
-    describe "mappingPropsOKf" do
+        (hmapRec f input) `shouldEqual` expected
+    describe "hmapKRec" do
       it "should recursively mapK a natural transformation over a record" do
         let
           input :: MapKInput
@@ -130,4 +130,4 @@ spec =
                 }
             , i: Just 40
             }
-        (mappingPropsOfK nt input) `shouldEqual` expected
+        (hmapKRec nt input) `shouldEqual` expected
