@@ -155,7 +155,7 @@ data HMapKRec f g
   = HMapKRec (f ~> g)
 
 -- Matches if the type of the current field in the record is f a and therefore needs to be naturally transformed. 
-instance hmapRecK_1 ::
+instance hmapKRec_1 ::
   ( IsSymbol sym
   , Row.Lacks sym rb
   , Row.Cons sym (g a) rb rc
@@ -169,7 +169,7 @@ instance hmapRecK_1 ::
   foldingWithIndex (HMapKRec nt) prop rin fa = (rin >>> Builder.insert prop (nt fa))
 
 -- Matches if the type of the current field in the record is another record and therefore needs to be recursed.
-else instance hmapRecK_2 ::
+else instance hmapKRec_2 ::
   ( IsSymbol sym
   , Row.Lacks sym rb
   , RowToList x xRL
@@ -192,7 +192,7 @@ else instance hmapRecK_2 ::
     fx = hmapKRec nt x
 
 -- Matches if the type of the current field in the record is any other type independent of the natural transformation.
-else instance hmapRecK_3 ::
+else instance hmapKRec_3 ::
   ( IsSymbol sym
   , Row.Lacks sym rb
   , Row.Cons sym x rb rc
