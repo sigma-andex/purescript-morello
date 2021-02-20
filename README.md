@@ -94,7 +94,7 @@ second = convert validPerson
 -- pure ({ details: { jobType: Worker, salary: (Salary 200000.0), title: (Title "Pilot") } })
 ```
 
-See also [MinimalSpec](./src/test/Morello/Morello/MinimalSpec.purs).
+See also [MinimalSpec](./test/Morello/Morello/MinimalSpec.purs).
 
 ## Usage 
 
