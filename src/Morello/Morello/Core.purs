@@ -18,7 +18,7 @@ import Prim.Row (class Union)
 import Prim.RowList (class RowToList)
 import Record (union)
 import Record.Builder (Builder)
-import Type.Prelude (Proxy)
+import Type.Prelude (Proxy(..))
 
 branch :: forall input. input -> Tuple input (Validated {})
 branch = identity &&& const (valid {})
@@ -98,35 +98,39 @@ as _ = iso wrap unwrap
 as' :: forall s a. Newtype s a => Iso' a s 
 as' = iso wrap unwrap
 
-validateL :: forall a. Validate a -> Lens' a (Validated a)
-validateL validated = 
-  lens' \field ->
-    Tuple
-      (validated field) 
-      (\b -> case b of
-        V (Left err) -> field
-        V (Right v) -> v 
-      )
+-- validateL :: forall a. Validate a -> Lens' a (Validated a)
+-- validateL validated = 
+--   lens' \field ->
+--     Tuple
+--       (validated field) 
+--       (\b -> case b of
+--         V (Left err) -> field
+--         V (Right v) -> v 
+--       )
 
-validateOverL :: forall n a. Newtype n a => (a -> n) -> Validate a -> Lens' a (Validated n)
-validateOverL _ validated = 
-    lens' \field ->
-        Tuple
-        (validated field <#> wrap) 
-        (\b -> case b of
-            V (Left err) -> field
-            V (Right v) -> unwrap v 
-        )
+-- validateOverL :: forall n a. Newtype n a => (a -> n) -> Validate a -> Lens' a (Validated n)
+-- validateOverL _ validated = 
+--     lens' \field ->
+--         Tuple
+--         (validated field <#> wrap) 
+--         (\b -> case b of
+--             V (Left err) -> field
+--             V (Right v) -> unwrap v 
+--         )
 
 infixr 9 compose as |>
 
-pick :: forall s a. AGetter' s (Validated a) -> Validator s a
-pick lens = Validator (view lens)
+pick' :: forall s a b. AGetter' s a -> Validate a b -> Validator s b
+pick' lens validate = Validator (view lens >>> validate)
 
-pickP :: forall s a. Proxy s -> AGetter' s (Validated a) -> Validator s a
-pickP _ lens = Validator (view lens)
+pick :: forall s a b. Proxy s -> AGetter' s a -> Validate a b -> Validator s b
+pick _ lens validate = pick' lens validate
+
 
 type Key r = SProxy r
 
 key :: forall r. Key r
 key = SProxy
+
+type Typ r = Proxy r 
+typ = Proxy

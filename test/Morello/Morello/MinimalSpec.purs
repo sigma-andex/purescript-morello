@@ -1,7 +1,7 @@
 module Morello.Morello.MinimalSpec where
 
-import Morello.Morello 
-import Prelude 
+import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid, (|>))
+import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 
 import Data.Array.NonEmpty as NonEmpty
 import Data.Either (Either(..))
@@ -10,9 +10,9 @@ import Data.Generic.Rep.Show (genericShow)
 import Data.Lens.Record (prop)
 import Data.Newtype (class Newtype)
 import Data.Validation.Semigroup (V(..))
+import Morello.Morello.Validated (Validator)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Type.Proxy (Proxy(..))
 
 -- define your (weakly typed) input model
 type PersonInput
@@ -42,18 +42,14 @@ titleL = prop (key :: _ "title")
 salaryL = prop (key :: _ "salary")
 
 -- write your (business logic) validation
-titleValidator :: Validate String
-titleValidator "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
-titleValidator s = valid s
+validateTitle :: Validate String Title
+validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
+validateTitle s = valid (Title s)
 
-salaryValidator :: Validate Number
-salaryValidator n 
-    | n > 50000.0 = valid n
-salaryValidator n = invalid (FieldInvalid "Salary is too damn low")
-
--- some necessary type information
-pickV = pickP (Proxy :: Proxy PersonInput)
-
+validateSalary :: Validate Number Salary
+validateSalary n 
+    | n > 50000.0 = valid (Salary n)
+validateSalary n = invalid (FieldInvalid "Salary is too damn low")
 
 -- define your convert function
 convert :: PersonInput -> Validated PersonOutput
@@ -63,9 +59,9 @@ convert =
             details : { -- by defining how your output format should look like
                 title: 
                     -- then pick data from your input and validate them 
-                    pickV (professionL |> titleL |> validateOverL Title titleValidator)
+                    pick' (professionL |> titleL ) validateTitle :: Validator PersonInput Title
               , salary:
-                    pickV (professionL |> salaryL |> validateOverL Salary salaryValidator)
+                    pick' (professionL |> salaryL ) validateSalary :: Validator PersonInput Salary
               -- you can also set constant data
               , jobType : Worker
             }
@@ -91,9 +87,11 @@ validPerson =
 
 first :: Validated PersonOutput
 first = convert invalidPerson
+-- invalid ((NonEmptyArray [(FieldInvalid "Salary is too damn low"),(FieldInvalid "Software Engineering is not a serious profession")]))
 
 second :: Validated PersonOutput
 second = convert validPerson
+-- pure ({ details: { jobType: Worker, salary: (Salary 200000.0), title: (Title "Pilot") } })
 
 instance salaryShow :: Show Salary where
   show = genericShow

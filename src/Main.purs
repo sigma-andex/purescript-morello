@@ -1,6 +1,7 @@
 module Main where
 
 import Prelude
+
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens.Record (prop)
@@ -8,9 +9,12 @@ import Data.Newtype (class Newtype)
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import Morello.Morello (blossom, branch, cherry, key, pickP, validateL, validateOverL, (|>), (🌱), (🌸), (🍒), Validate, Validated, ValidationError(..), invalid, valid)
-import Type.Prelude (Proxy(..))
+import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid, (|>), (🌱), (🌸), (🍒))
+import Morello.Morello.Validated (Validator)
 
+type Profession = { title :: String
+        , salary :: Number
+        }
 type PersonInput
   = { person ::
         { addresses ::
@@ -25,7 +29,7 @@ type PersonInput
     }
 
 type PersonOutput
-  = { title :: String, salary :: Number }
+  = { title :: Title, salary :: Salary }
 
 newtype Title
   = Title String
@@ -56,8 +60,10 @@ derive instance jobTypeGen :: Generic JobType _
 instance jobTypeShow :: Show JobType where
   show = genericShow
 
+
+type JobData = { title :: Title, salary :: Salary, jobType :: JobType }
 type PersonOutput2
-  = { details :: { title :: Title, salary :: Salary, jobType :: JobType } }
+  = { jobData :: JobData }
 
 invalidPerson :: PersonInput
 invalidPerson =
@@ -99,44 +105,49 @@ titleL = prop (key :: _ "title")
 
 salaryL = prop (key :: _ "salary")
 
-titleValidator :: Validate String
-titleValidator "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
+validateTitle :: Validate String Title
+validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
 
-titleValidator s = valid s
+validateTitle s = valid (Title s)
 
-salaryValidator :: Validate Number
-salaryValidator n
-  | n > 150000.0 = valid n
+validateSalary :: Validate Number Salary
+validateSalary n
+  | n > 150000.0 = valid (Salary n)
 
-salaryValidator n = invalid (FieldInvalid "Salary is too low")
+validateSalary n = invalid (FieldInvalid "Salary is too low")
 
-pickV = pickP (Proxy :: Proxy PersonInput)
+--pick = pickVP (Proxy :: Proxy PersonInput)
 
-convert :: PersonInput -> Validated PersonOutput
+convert :: PersonInput -> Validated PersonOutput2
 convert =
   branch
     >>> cherry
-        { title:
-            pickV (professionL |> titleL |> validateL titleValidator)
-        , salary:
-            pickV (professionL |> salaryL |> validateL salaryValidator)
+        { jobData : pick' (professionL) 
+            (branch
+              >>> cherry 
+                  {
+                    title: pick' (titleL) validateTitle :: Validator Profession Title
+                  , salary: pick' (salaryL) validateSalary :: Validator Profession Salary
+                  , jobType: Worker
+                  }
+              >>> blossom) :: Validator PersonInput JobData
         }
     >>> blossom
 
 convert2 :: PersonInput -> Validated PersonOutput
 convert2 =
   (🌱)
-    >>> (🍒) { title: pickV (professionL |> titleL |> validateL titleValidator) }
-    >>> (🍒) { salary: pickV (professionL |> salaryL |> validateL salaryValidator) }
+    >>> (🍒) { title: pick' (professionL |> titleL) validateTitle :: Validator PersonInput Title }
+    >>> (🍒) { salary: pick' (professionL |> salaryL) validateSalary :: Validator PersonInput Salary }
     >>> (🌸)
 
 convert3 :: PersonInput -> Validated PersonOutput2
 convert3 =
   branch
     >>> cherry
-        { details:
-            { title: pickV (professionL |> titleL |> validateOverL Title titleValidator)
-            , salary: pickV (professionL |> salaryL |> validateOverL Salary salaryValidator)
+        { jobData:
+            { title: pick' (professionL |> titleL) validateTitle :: Validator PersonInput Title 
+            , salary: pick' (professionL |> salaryL) validateSalary :: Validator PersonInput Salary 
             , jobType: Worker
             }
         }

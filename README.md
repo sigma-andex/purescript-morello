@@ -7,12 +7,6 @@ The goal of this library is to make it super simple to validate input data and t
 ## Quick start
 
 ```purescript
-import Prelude
-import Data.Lens.Record (prop)
-import Data.Newtype (class Newtype)
-import Type.Proxy (Proxy(..))
-import Morello.Morello
-
 -- define your (weakly typed) input model
 type PersonInput
   = { profession ::
@@ -41,17 +35,14 @@ titleL = prop (key :: _ "title")
 salaryL = prop (key :: _ "salary")
 
 -- write your (business logic) validation
-titleValidator :: Validate String
-titleValidator "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
-titleValidator s = valid s
+validateTitle :: Validate String Title
+validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
+validateTitle s = valid (Title s)
 
-salaryValidator :: Validate Number
-salaryValidator n 
-    | n > 50000.0 = valid n
-salaryValidator n = invalid (FieldInvalid "Salary is too damn low")
-
--- some necessary type information
-pickV = pickP (Proxy :: Proxy PersonInput)
+validateSalary :: Validate Number Salary
+validateSalary n 
+    | n > 50000.0 = valid (Salary n)
+validateSalary n = invalid (FieldInvalid "Salary is too damn low")
 
 -- now let's start converting! 
 convert :: PersonInput -> Validated PersonOutput
@@ -61,10 +52,10 @@ convert =
             details : { -- by defining how your output format should look like
                 title: 
                     -- then pick data from your input by zooming in using the lens...
-                    pickV (professionL |> titleL |> validateOverL Title titleValidator)
+                    pick' (professionL |> titleL ) validateTitle :: Validator PersonInput Title
               , salary:
                     -- ...and validate using your validator
-                    pickV (professionL |> salaryL |> validateOverL Salary salaryValidator)
+                    pick' (professionL |> salaryL ) validateSalary :: Validator PersonInput Salary
               -- you can also set constant data
               , jobType : Worker
             }

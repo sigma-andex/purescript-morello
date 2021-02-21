@@ -36,5 +36,7 @@ newtype Validator input a
 applyValidator :: forall input a. input -> Validator input a -> Validated a
 applyValidator input (Validator v) = v input
 
-type Validate a
-  = a -> Validated a
+type Validate a b
+  = a -> Validated b
+
+type Validate' a = Validate a a 
