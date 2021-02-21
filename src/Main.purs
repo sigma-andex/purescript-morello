@@ -1,7 +1,6 @@
 module Main where
 
 import Prelude
-
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens.Record (prop)
@@ -9,12 +8,14 @@ import Data.Newtype (class Newtype)
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid, (|>), (🌱), (🌸), (🍒))
+import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
 import Morello.Morello.Validated (Validator)
 
-type Profession = { title :: String
-        , salary :: Number
-        }
+type Profession
+  = { title :: String
+    , salary :: Number
+    }
+
 type PersonInput
   = { person ::
         { addresses ::
@@ -60,8 +61,9 @@ derive instance jobTypeGen :: Generic JobType _
 instance jobTypeShow :: Show JobType where
   show = genericShow
 
+type JobData
+  = { title :: Title, salary :: Salary, jobType :: JobType }
 
-type JobData = { title :: Title, salary :: Salary, jobType :: JobType }
 type PersonOutput2
   = { jobData :: JobData }
 
@@ -117,28 +119,29 @@ validateSalary n
 validateSalary n = invalid (FieldInvalid "Salary is too low")
 
 --pick = pickVP (Proxy :: Proxy PersonInput)
-
 convert :: PersonInput -> Validated PersonOutput2
 convert =
   branch
     >>> cherry
-        { jobData : pick' (professionL) 
-            (branch
-              >>> cherry 
-                  {
-                    title: pick' (titleL) validateTitle :: Validator Profession Title
-                  , salary: pick' (salaryL) validateSalary :: Validator Profession Salary
-                  , jobType: Worker
-                  }
-              >>> blossom) :: Validator PersonInput JobData
+        { jobData:
+            pick (professionL)
+              ( branch
+                  >>> cherry
+                      { title: pick (titleL) validateTitle :: Validator Profession Title
+                      , salary: pick (salaryL) validateSalary :: Validator Profession Salary
+                      , jobType: Worker
+                      }
+                  >>> blossom
+              ) ::
+              Validator PersonInput JobData
         }
     >>> blossom
 
 convert2 :: PersonInput -> Validated PersonOutput
 convert2 =
   (🌱)
-    >>> (🍒) { title: pick' (professionL |> titleL) validateTitle :: Validator PersonInput Title }
-    >>> (🍒) { salary: pick' (professionL |> salaryL) validateSalary :: Validator PersonInput Salary }
+    >>> (🍒) { title: pick (professionL |> titleL) validateTitle :: Validator PersonInput Title }
+    >>> (🍒) { salary: pick (professionL |> salaryL) validateSalary :: Validator PersonInput Salary }
     >>> (🌸)
 
 convert3 :: PersonInput -> Validated PersonOutput2
@@ -146,8 +149,8 @@ convert3 =
   branch
     >>> cherry
         { jobData:
-            { title: pick' (professionL |> titleL) validateTitle :: Validator PersonInput Title 
-            , salary: pick' (professionL |> salaryL) validateSalary :: Validator PersonInput Salary 
+            { title: pick (professionL |> titleL) validateTitle :: Validator PersonInput Title
+            , salary: pick (professionL |> salaryL) validateSalary :: Validator PersonInput Salary
             , jobType: Worker
             }
         }
