@@ -14,7 +14,7 @@ type PersonInput = { profession :: { title :: String, salary :: Number } }
 -- ...and an output model...
 type PersonOutput = { details :: { title :: Title, salary :: Salary, jobType :: JobType } }
 
--- ..write some validators...
+-- ...write some validators...
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
 validateTitle s = valid (Title s)
@@ -33,7 +33,7 @@ convert =
         { 
             details : { 
                 title: 
-                    -- ...by picking data from the input... 
+                    -- ...picking data from the input record... 
                     pick (professionL |> titleL ) validateTitle :: Validator PersonInput Title
               , salary:
                     -- ...and validating it using validators.
