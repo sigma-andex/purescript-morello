@@ -4,37 +4,17 @@ A purescript library for cherry-picking 🍒 your data.
 
 The goal of this library is to make it super simple to validate input data and transform it into output data.
 
-## Quick start
+## tl;dr 
+Transform & validate your input data in a declarative way.
 
 ```purescript
--- define your (weakly typed) input model
-type PersonInput
-  = { profession ::
-        { title :: String
-        , salary :: Number
-        }
-    }
+-- Given an input model...
+type PersonInput = { profession :: { title :: String, salary :: Number } }
 
--- define your (strongly typed) output model
-newtype Title = Title String
-derive instance titleNT :: Newtype Title _
+-- ...and an output model...
+type PersonOutput = { details :: { title :: Title, salary :: Salary, jobType :: JobType } }
 
-newtype Salary = Salary Number
-derive instance salaryNT :: Newtype Salary _
-
-data JobType = Worker | Manager
-
-type PersonOutput
-  = { details :: { title :: Title, salary :: Salary, jobType :: JobType } }
-
--- define lenses for accessing the input object
-professionL = prop (key :: _ "profession")
-
-titleL = prop (key :: _ "title")
-
-salaryL = prop (key :: _ "salary")
-
--- write your (business logic) validation
+-- ..write some validators...
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
 validateTitle s = valid (Title s)
@@ -44,54 +24,38 @@ validateSalary n
     | n > 50000.0 = valid (Salary n)
 validateSalary n = invalid (FieldInvalid "Salary is too damn low")
 
--- now let's start converting! 
+-- ...and create a conversion in a declarative way.. 
 convert :: PersonInput -> Validated PersonOutput
 convert =
-  branch -- start with a branch
-    >>> cherry { -- then start cherry picking
-            details : { -- by defining how your output format should look like
+  branch 
+    >>> cherry 
+        -- ...by defining how your output data will look like...
+        { 
+            details : { 
                 title: 
-                    -- then pick data from your input by zooming in using the lens...
+                    -- ...by picking data from the input... 
                     pick (professionL |> titleL ) validateTitle :: Validator PersonInput Title
               , salary:
-                    -- ...and validate using your validator
+                    -- ...and validating it using validators.
                     pick (professionL |> salaryL ) validateSalary :: Validator PersonInput Salary
-              -- you can also set constant data
               , jobType : Worker
             }
         }
-    >>> blossom -- finish up
-
--- convert your data
-invalidPerson :: PersonInput
-invalidPerson =
-  { profession:
-      { title: "Software Engineer"
-      , salary: 30000.0
-      }
-  }
-
-validPerson :: PersonInput
-validPerson =
-  { profession:
-      { title: "Pilot"
-      , salary: 200000.0
-      }
-  }
-first :: Validated PersonOutput
-first = convert invalidPerson
--- invalid ((NonEmptyArray [(FieldInvalid "Salary is too damn low"),(FieldInvalid "Software Engineering is not a serious profession")]))
-
-second :: Validated PersonOutput
-second = convert validPerson
--- pure ({ details: { jobType: Worker, salary: (Salary 200000.0), title: (Title "Pilot") } })
+    >>> blossom 
 ```
+## Quick start
 
-See also [MinimalSpec](./test/Morello/Morello/MinimalSpec.purs).
+See [quick start](./docs/quickstart.md)
+
+## Features
+
+- Declarative data conversion
+- Automatic, parallel error accumulation
+- Composable 
 
 ## Usage 
 
-
+TBD
 
 ## Connecting the dots 
 
