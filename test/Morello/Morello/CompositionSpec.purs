@@ -8,7 +8,7 @@ import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
-import Morello.Morello.Core (unpit)
+import Morello.Morello.Core (pit)
 import Morello.Morello.TestUtil (invalids)
 import Morello.Morello.Validated (Validator)
 import Test.Spec (Spec, describe, it)
@@ -158,7 +158,7 @@ convert =
             , jobType: Worker
             }
         , addresses:
-            unpit (personL |> addressesL)
+            pit (personL |> addressesL)
               ( branch
                   >>> cherry
                       { zip: pick (zipL) validateZip :: Validator InputAddress Zip
@@ -187,7 +187,7 @@ convert2 =
         }
     >>> cherry
         { addresses:
-            unpit (personL |> addressesL)
+            pit (personL |> addressesL)
               ( branch
                   >>> cherry
                       { zip: pick (zipL) validateZip :: Validator InputAddress Zip
@@ -210,7 +210,7 @@ convert3 =
         }
     >>> (🍒)
         { addresses:
-            unpit (personL |> addressesL)
+            pit (personL |> addressesL)
               ( branch
                   >>> cherry
                       { zip: pick (zipL) validateZip :: Validator InputAddress Zip

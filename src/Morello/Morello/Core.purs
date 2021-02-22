@@ -2,9 +2,7 @@ module Morello.Morello.Core where
 
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
-import Data.Lens (AGetter', Iso', iso, view)
-import Data.Newtype (class Newtype, unwrap, wrap)
-import Data.Profunctor (class Profunctor)
+import Data.Lens (AGetter', view)
 import Data.Profunctor.Strong ((&&&))
 import Data.Symbol (SProxy(..))
 import Data.Traversable (class Traversable, traverse)
@@ -97,8 +95,8 @@ pick lens validate = Validator (view lens >>> validate)
 pick' :: forall s a b. Proxy s -> AGetter' s a -> Validate a b -> Validator s b
 pick' _ lens validate = pick lens validate
 
-unpit :: forall f s a b. Traversable f => AGetter' s (f a) -> Validate a b -> Validator s (f b)
-unpit lens validate = Validator (view lens >>> traverse validate)
+pit :: forall f s a b. Traversable f => AGetter' s (f a) -> Validate a b -> Validator s (f b)
+pit lens validate = Validator (view lens >>> traverse validate)
 
 type Key r = SProxy r
 
