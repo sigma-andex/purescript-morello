@@ -3,11 +3,14 @@ module Morello.Morello.Core where
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Either (Either(..))
-import Data.Lens (AGetter', Lens', Iso', iso, lens', view)
+import Data.Function (flip)
+import Data.Lens (AGetter', Iso', Lens', Fold, iso, lens', preview, view)
+import Data.Maybe.First (First(..))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Profunctor (class Profunctor)
 import Data.Profunctor.Strong ((&&&))
 import Data.Symbol (SProxy(..))
+import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V(..))
 import Heterogeneous.Folding (class FoldlRecord)
@@ -106,6 +109,8 @@ pick lens validate = Validator (view lens >>> validate)
 pick' :: forall s a b. Proxy s -> AGetter' s a -> Validate a b -> Validator s b
 pick' _ lens validate = pick lens validate
 
+unpit :: forall f s a b. Traversable f => AGetter' s (f a) -> Validate a b -> Validator s (f b)
+unpit lens validate = Validator (view lens >>> traverse validate)
 
 type Key r = SProxy r
 
