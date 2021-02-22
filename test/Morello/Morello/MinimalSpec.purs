@@ -1,16 +1,17 @@
 module Morello.Morello.MinimalSpec where
 
-import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>))
-import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
-
 import Data.Array.NonEmpty as NonEmpty
 import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens.Record (prop)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Validation.Semigroup (V(..))
+import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>))
+import Morello.Morello.TestUtil (invalids)
 import Morello.Morello.Validated (Validator)
+import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
@@ -112,14 +113,7 @@ spec :: Spec Unit
 spec =
   describe "Morello.Morello" do
     describe "cherry conversion" do
-      it "should fail in case of invalid data" do
-        let 
-            expected = V (Left (NonEmpty.singleton (FieldInvalid "Salary is too damn low") `NonEmpty.snoc` FieldInvalid "Software Engineering is not a serious profession"))            
-            actual = convert invalidPerson
-        
-        actual `shouldEqual` expected
-
-      it "should be successful in case of valid data" do
+      it "should successfully convert valid data" do
         let 
             expected :: PersonOutput
             expected = {
@@ -132,3 +126,10 @@ spec =
             actual = convert validPerson
         
         actual `shouldEqual` (valid expected)
+
+      it "should fail in case of invalid data" do
+        let 
+            expected = invalids [ FieldInvalid "Salary is too damn low", FieldInvalid "Software Engineering is not a serious profession"]
+            actual = convert invalidPerson
+        
+        (Just actual) `shouldEqual` expected
