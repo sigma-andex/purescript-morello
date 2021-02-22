@@ -95,8 +95,8 @@ pick lens validate = Validator (view lens >>> validate)
 pick' :: forall s a b. Proxy s -> AGetter' s a -> Validate a b -> Validator s b
 pick' _ lens validate = pick lens validate
 
-pit :: forall f s a b. Traversable f => AGetter' s (f a) -> Validate a b -> Validator s (f b)
-pit lens validate = Validator (view lens >>> traverse validate)
+core :: forall f s a b. Traversable f => AGetter' s (f a) -> Validate a b -> Validator s (f b)
+core lens validate = Validator (view lens >>> traverse validate)
 
 type Key r = SProxy r
 
