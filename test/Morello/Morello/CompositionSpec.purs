@@ -1,4 +1,4 @@
-module Main where
+module Morello.Morello.CompositionSpec where
 
 import Prelude
 import Data.Generic.Rep (class Generic)
@@ -7,12 +7,12 @@ import Data.Int (fromString)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Effect (Effect)
-import Effect.Class.Console (logShow)
-import Effect.Console (log)
 import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
 import Morello.Morello.Core (unpit)
+import Morello.Morello.TestUtil (invalids)
 import Morello.Morello.Validated (Validator)
+import Test.Spec (Spec, describe, it)
+import Test.Spec.Assertions (shouldEqual)
 
 type InputProfession
   = { title :: String
@@ -37,6 +37,8 @@ derive instance titleNT :: Newtype Title _
 
 derive instance titleGen :: Generic Title _
 
+derive instance titleEq :: Eq Title
+
 instance titleShow :: Show Title where
   show = genericShow
 
@@ -47,6 +49,8 @@ derive instance salaryNT :: Newtype Salary _
 
 derive instance salaryGen :: Generic Salary _
 
+derive instance salaryEq :: Eq Salary
+
 instance salaryShow :: Show Salary where
   show = genericShow
 
@@ -55,6 +59,8 @@ data JobType
   | Manager
 
 derive instance jobTypeGen :: Generic JobType _
+
+derive instance jobTypeEq :: Eq JobType
 
 instance jobTypeShow :: Show JobType where
   show = genericShow
@@ -66,6 +72,8 @@ derive instance zipNT :: Newtype Zip _
 
 derive instance zipGen :: Generic Zip _
 
+derive instance zipEq :: Eq Zip
+
 instance zipShow :: Show Zip where
   show = genericShow
 
@@ -75,7 +83,7 @@ type Address
 type JobData
   = { title :: Title, salary :: Salary, jobType :: JobType }
 
-type PersonOutput
+type Person
   = { jobData :: JobData, addresses :: Array Address }
 
 invalidPerson :: InputPerson
@@ -122,8 +130,6 @@ titleL = prop (key :: _ "title")
 
 salaryL = prop (key :: _ "salary")
 
-vacationL = prop (key :: _ "customVacation")
-
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
 
@@ -142,8 +148,29 @@ validateZip n = case fromString n of
   Just zip -> invalid (FieldInvalid $ "Zip " <> n <> " out of range")
   Nothing -> invalid (FieldInvalid $ n <> " is not a valid zip")
 
-convert :: InputPerson -> Validated PersonOutput
+convert :: InputPerson -> Validated Person
 convert =
+  branch
+    >>> cherry
+        { jobData:
+            { title: pick (professionL |> titleL) validateTitle :: Validator InputPerson Title
+            , salary: pick (professionL |> salaryL) validateSalary :: Validator InputPerson Salary
+            , jobType: Worker
+            }
+        , addresses:
+            unpit (personL |> addressesL)
+              ( branch
+                  >>> cherry
+                      { zip: pick (zipL) validateZip :: Validator InputAddress Zip
+                      }
+                  >>> blossom
+              ) ::
+              Validator InputPerson (Array Address)
+        }
+    >>> blossom
+
+convert2 :: InputPerson -> Validated Person
+convert2 =
   branch
     >>> cherry
         { jobData:
@@ -171,8 +198,8 @@ convert =
         }
     >>> blossom
 
-convert2 :: InputPerson -> Validated PersonOutput
-convert2 =
+convert3 :: InputPerson -> Validated Person
+convert3 =
   (🌱)
     >>> (🍒)
         { jobData:
@@ -181,19 +208,8 @@ convert2 =
             , jobType: Worker
             }
         }
-    >>> (🍒) { addresses: [] }
-    >>> (🌸)
-
-convert3 :: InputPerson -> Validated PersonOutput
-convert3 =
-  branch
-    >>> cherry
-        { jobData:
-            { title: pick (professionL |> titleL) validateTitle :: Validator InputPerson Title
-            , salary: pick (professionL |> salaryL) validateSalary :: Validator InputPerson Salary
-            , jobType: Worker
-            }
-        , addresses:
+    >>> (🍒)
+        { addresses:
             unpit (personL |> addressesL)
               ( branch
                   >>> cherry
@@ -203,16 +219,73 @@ convert3 =
               ) ::
               Validator InputPerson (Array Address)
         }
-    >>> blossom
+    >>> (🌸)
 
-main :: Effect Unit
-main = do
-  log "\n----example 1----\n"
-  logShow $ convert invalidPerson
-  logShow $ convert validPerson
-  log "\n----example 2----\n"
-  logShow $ convert2 invalidPerson
-  logShow $ convert2 validPerson
-  log "\n----example 3----\n"
-  logShow $ convert3 invalidPerson
-  logShow $ convert3 validPerson
+expectedValid :: Validated Person
+expectedValid =
+  pure
+    $ { jobData:
+          { title: Title "Pilot"
+          , salary: Salary 200000.0
+          , jobType: Worker
+          }
+      , addresses:
+          [ { zip: Zip 12300
+            }
+          , { zip: Zip 45600
+            }
+          ]
+      }
+
+expectedInvalid :: Maybe (Validated Person)
+expectedInvalid =
+  invalids
+    $ [ FieldInvalid "Zip 123 out of range"
+      , FieldInvalid "asdf is not a valid zip"
+      , FieldInvalid "Salary of 120000.0 is too low"
+      , FieldInvalid "Software Engineering is not a serious profession"
+      ]
+
+expectedInvalid2 :: Maybe (Validated Person)
+expectedInvalid2 =
+  invalids
+    $ [ FieldInvalid "Salary of 120000.0 is too low"
+      , FieldInvalid "Software Engineering is not a serious profession"
+      , FieldInvalid "Zip 123 out of range"
+      , FieldInvalid "asdf is not a valid zip"
+      ]
+
+expectedInvalid3 :: Maybe (Validated Person)
+expectedInvalid3 =
+  invalids
+    $ [ FieldInvalid "Salary of 120000.0 is too low"
+      , FieldInvalid "Software Engineering is not a serious profession"
+      , FieldInvalid "Zip 123 out of range"
+      , FieldInvalid "asdf is not a valid zip"
+      ]
+
+spec :: Spec Unit
+spec =
+  describe "Morello.Morello" do
+    describe "cherry" do
+      it "should convert a valid data structure" do
+        let
+          actual = convert validPerson
+        actual `shouldEqual` expectedValid
+        let
+          actual2 = convert invalidPerson
+        (Just actual2) `shouldEqual` expectedInvalid
+      it "should support composition" do
+        let
+          actual = convert2 validPerson
+        actual `shouldEqual` expectedValid
+        let
+          actual2 = convert2 invalidPerson
+        (Just actual2) `shouldEqual` expectedInvalid2
+      it "should support 🍒 unicode 🌸" do
+        let
+          actual = convert3 validPerson
+        actual `shouldEqual` expectedValid
+        let
+          actual2 = convert3 invalidPerson
+        (Just actual2) `shouldEqual` expectedInvalid3

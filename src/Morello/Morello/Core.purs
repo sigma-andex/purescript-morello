@@ -2,17 +2,14 @@ module Morello.Morello.Core where
 
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
-import Data.Either (Either(..))
-import Data.Function (flip)
-import Data.Lens (AGetter', Iso', Lens', Fold, iso, lens', preview, view)
-import Data.Maybe.First (First(..))
+import Data.Lens (AGetter', Iso', iso, view)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Profunctor (class Profunctor)
 import Data.Profunctor.Strong ((&&&))
 import Data.Symbol (SProxy(..))
 import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
-import Data.Validation.Semigroup (V(..))
+import Data.Validation.Semigroup (V)
 import Heterogeneous.Folding (class FoldlRecord)
 import Morello.Morello.Record (HMapKRec, SequenceRec, hmapKRec, sequenceRec)
 import Morello.Morello.Validated (Validated, ValidationError, Validator(..), Validate, applyValidator, valid)
@@ -91,15 +88,6 @@ blossom :: forall input output. Tuple input (Validated output) -> Validated outp
 blossom = snd
 
 infixr 8 blossom as 🌸
-
-asIs :: forall p t2 t3. Profunctor p => p t2 t3 -> p t2 t3
-asIs = iso identity identity
-
-as :: forall s a. Newtype s a => (a -> s) -> Iso' a s 
-as _ = iso wrap unwrap
-
-as' :: forall s a. Newtype s a => Iso' a s 
-as' = iso wrap unwrap
 
 infixr 9 compose as |>
 
