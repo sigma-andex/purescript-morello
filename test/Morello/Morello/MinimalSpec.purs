@@ -1,16 +1,12 @@
 module Morello.Morello.MinimalSpec where
 
-import Data.Array.NonEmpty as NonEmpty
-import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Validation.Semigroup (V(..))
-import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>))
+import Morello.Morello (Validate, Validated, ValidationError(..), Validator, blossom, branch, cherry, invalid, key, pick, valid, (|>))
 import Morello.Morello.TestUtil (invalids)
-import Morello.Morello.Validated (Validator)
 import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)

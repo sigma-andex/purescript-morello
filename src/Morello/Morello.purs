@@ -4,6 +4,6 @@ module Morello.Morello
   , module Morello.Morello.Validated
   ) where
 
-import Morello.Morello.Core (Key, applyTemplate, blossom, branch, cherry, dual, key, pick, pick', (|>), (🌱), (🌸), (🍒))
+import Morello.Morello.Core (Key, applyTemplate, blossom, branch, cherry, dual, key, pick, pick', core, (|>), (🌱), (🌸), (🍒))
 import Morello.Morello.Record (HMapRec(..), HMapKRec(..), SequenceRec(..), hmapRec, hmapKRec, sequenceRec)
-import Morello.Morello.Validated (Validate, Validated, ValidationError(..), invalid, valid)
+import Morello.Morello.Validated (Validate, Validated, ValidationError(..), invalid, valid, Validator)

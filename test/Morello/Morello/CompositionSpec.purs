@@ -1,16 +1,15 @@
 module Morello.Morello.CompositionSpec where
 
 import Prelude
+
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Int (fromString)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
-import Morello.Morello.Core (core)
+import Morello.Morello (Validate, Validated, ValidationError(..), Validator, blossom, branch, cherry, core, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
 import Morello.Morello.TestUtil (invalids)
-import Morello.Morello.Validated (Validator)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
