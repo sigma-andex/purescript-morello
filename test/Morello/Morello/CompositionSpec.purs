@@ -129,6 +129,7 @@ titleL = prop (key :: _ "title")
 
 salaryL = prop (key :: _ "salary")
 
+
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
 

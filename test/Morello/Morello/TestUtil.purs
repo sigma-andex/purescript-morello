@@ -6,8 +6,8 @@ import Data.Array.NonEmpty as NonEmpty
 import Data.Either (Either(..))
 import Data.Maybe (Maybe)
 import Data.Validation.Semigroup (V(..))
-import Morello.Morello (Validated, ValidationError)
+import Morello.Morello (ValidatedE)
 
-invalids :: forall r. Array ValidationError -> Maybe (Validated r)
+invalids :: forall r err. Array err -> Maybe (ValidatedE err r)
 invalids errs = 
     NonEmpty.fromArray errs <#> V <<< Left 
