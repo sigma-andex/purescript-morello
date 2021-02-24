@@ -38,6 +38,7 @@ titleL = prop (key :: _ "title")
 
 salaryL = prop (key :: _ "salary")
 
+
 -- write your (business logic) validation
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
