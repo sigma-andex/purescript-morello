@@ -3,12 +3,11 @@
   [ "console"
   , "debug"
   , "effect"
-  , "generics-rep"
   , "heterogeneous"
   , "profunctor-lenses"
   , "psci-support"
   , "spec"
-  , "spec-discovery"
+  --, "spec-discovery"
   , "strings"
   , "validation"
   ]
