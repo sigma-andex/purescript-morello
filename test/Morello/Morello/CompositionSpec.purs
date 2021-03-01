@@ -3,7 +3,7 @@ module Morello.Morello.CompositionSpec where
 import Prelude
 
 import Data.Generic.Rep (class Generic)
-import Data.Generic.Rep.Show (genericShow)
+import Data.Show.Generic (genericShow)
 import Data.Int (fromString)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
