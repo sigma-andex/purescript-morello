@@ -33,7 +33,7 @@ convert =
         { 
             details : { 
                 title: 
-                    -- ...picking data from the input record... 
+                    -- ...picking data from the input record using a lens... 
                     pick (professionL |> titleL ) validateTitle :: Validator PersonInput Title
               , salary:
                     -- ...and validating it using validators.
@@ -65,13 +65,16 @@ See [quick start](./docs/quickstart.md)
 
 ## Usage 
 
-TBD
+See [usage guide](./docs/usage-guide.md)
 
-## Connecting the dots 
+## Contributing
+
+Contributions via issues & PRs are very welcome.
+
+## Acknowledgements 
 
 This work is merely connecting the dots of the amazing Purescript language and its awesome ecosystem. A special shout-out to the contributors & maintainers of the [`profunctor-lenses`](https://github.com/purescript-contrib/purescript-profunctor-lenses), [`heterogeneous`](https://github.com/natefaubion/purescript-heterogeneous/) and [`validation`](https://github.com/purescript/purescript-validation) libraries. This library wouldn't have been possible without these.
 
-
 ## License 
 
-Licenses under [MIT-0](LICENSE).
+Licensed under [MIT-0](LICENSE).
