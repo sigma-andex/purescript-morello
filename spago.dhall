@@ -1,4 +1,4 @@
-{ name = "purescript-morello"
+{ name = "morello"
 , dependencies =
   [ "console"
   , "debug"
