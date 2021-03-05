@@ -7,7 +7,7 @@
   , "profunctor-lenses"
   , "psci-support"
   , "spec"
-  --, "spec-discovery"
+  , "spec-discovery"
   , "strings"
   , "validation"
   ]
