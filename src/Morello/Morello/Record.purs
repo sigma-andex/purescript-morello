@@ -10,18 +10,18 @@ import Record.Builder as Builder
 import Type.Proxy (Proxy(..))
 
 -- Helper for type inference
-data SequenceRec (f :: Type -> Type)
-  = SequenceRec
+data HSequenceRec (f :: Type -> Type)
+  = HSequenceRec
 
 -- Matches if the type of the current field in the record is f a and therefore needs to be sequenced. 
-instance sequenceRec_1 ::
+instance hsequenceRec_1 ::
   ( Applicative f
   , IsSymbol sym
   , Row.Lacks sym rb
   , Row.Cons sym a rb rc
   ) =>
   FoldingWithIndex
-    (SequenceRec f)
+    (HSequenceRec f)
     (Proxy sym)
     (f (Builder { | ra } { | rb }))
     (f a)
@@ -29,38 +29,38 @@ instance sequenceRec_1 ::
   foldingWithIndex _ prop rin a = (>>>) <$> rin <*> (Builder.insert prop <$> a)
 
 -- Matches if the type of the current field in the record is another record and therefore needs to be recursed.
-else instance sequenceRec_2 ::
+else instance hsequenceRec_2 ::
   ( Applicative f
   , IsSymbol sym
   , Row.Lacks sym rb
   , RowToList x xRL
   , Row.Cons sym { | y } rb rc
   , FoldlRecord
-      (SequenceRec f)
+      (HSequenceRec f)
       (f (Builder (Record ()) (Record ())))
       xRL
       x
       (f (Builder (Record ()) (Record y)))
   ) =>
   FoldingWithIndex
-    (SequenceRec f)
+    (HSequenceRec f)
     (Proxy sym)
     (f (Builder { | ra } { | rb }))
     { | x }
     (f (Builder { | ra } { | rc })) where
   foldingWithIndex _ prop rin x = (>>>) <$> rin <*> (fx <#> Builder.insert prop)
     where
-    fx = sequenceRec x
+    fx = hsequenceRec x
 
 -- Matches if the type of the current field in the record is any other type independent of sequencing.
-else instance sequenceRec_3 ::
+else instance hsequenceRec_3 ::
   ( Applicative f
   , IsSymbol sym
   , Row.Lacks sym rb
   , Row.Cons sym x rb rc
   ) =>
   FoldingWithIndex
-    (SequenceRec f)
+    (HSequenceRec f)
     (Proxy sym)
     (f (Builder { | ra } { | rb }))
     x
@@ -68,17 +68,17 @@ else instance sequenceRec_3 ::
   foldingWithIndex _ prop rin x = (_ >>> Builder.insert prop x) <$> rin
 
 -- | Recursively sequence a record. E.g.
--- | sequenceRec { a : { b : { c : { d: Just 10, e : Just "hello" }, f : Just true } == 
+-- | hsequenceRec { a : { b : { c : { d: Just 10, e : Just "hello" }, f : Just true } == 
 -- |  Just { a : { b : { c : { d: 10, e : "hello" }, f : true }
-sequenceRec ::
+hsequenceRec ::
   forall f rin rout.
   Applicative f =>
-  HFoldlWithIndex (SequenceRec f) (f (Builder {} {})) { | rin } (f (Builder {} { | rout })) =>
+  HFoldlWithIndex (HSequenceRec f) (f (Builder {} {})) { | rin } (f (Builder {} { | rout })) =>
   { | rin } ->
   f { | rout }
-sequenceRec =
+hsequenceRec =
   map (flip Builder.build {})
-    <<< hfoldlWithIndex (SequenceRec :: SequenceRec f) (pure identity :: f (Builder {} {}))
+    <<< hfoldlWithIndex (HSequenceRec :: HSequenceRec f) (pure identity :: f (Builder {} {}))
 
 -- Helper for type inference
 data HMapRec a b

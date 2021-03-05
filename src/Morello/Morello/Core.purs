@@ -8,7 +8,7 @@ import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V)
 import Heterogeneous.Folding (class FoldlRecord)
-import Morello.Morello.Record (HMapKRec, SequenceRec, hmapKRec, sequenceRec)
+import Morello.Morello.Record (HMapKRec, HSequenceRec, hmapKRec, hsequenceRec)
 import Morello.Morello.Validated (ValidatedE, ValidatorE(..), ValidateE, applyValidator, valid)
 import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
 import Prim.Row (class Union)
@@ -45,13 +45,13 @@ applyTemplate ::
     rin
     (Builder (Record ()) (Record rthru)) =>
   FoldlRecord
-    (SequenceRec (V (NonEmptyArray err)))
+    (HSequenceRec (V (NonEmptyArray err)))
     (V (NonEmptyArray err) (Builder (Record ()) (Record ())))
     rthruRL
     rthru
     (V (NonEmptyArray err) (Builder (Record ()) (Record rout))) =>
   (ValidatorE input err ~> ValidatedE err) -> { | rin } -> ValidatedE err { | rout }
-applyTemplate nt = hmapKRec nt >>> sequenceRec
+applyTemplate nt = hmapKRec nt >>> hsequenceRec
 
 cherry ::
   forall input err from to rin rinRL rthru rthruRL rout routRL.
@@ -65,7 +65,7 @@ cherry ::
     rin
     (Builder (Record ()) (Record rthru)) =>
   FoldlRecord
-    (SequenceRec (V (NonEmptyArray err)))
+    (HSequenceRec (V (NonEmptyArray err)))
     (V (NonEmptyArray err) (Builder (Record ()) (Record ())))
     rthruRL
     rthru
