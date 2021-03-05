@@ -1,12 +1,13 @@
 module Morello.Morello.Record where
 
 import Prelude
-import Data.Symbol (class IsSymbol, SProxy)
+import Data.Symbol (class IsSymbol)
 import Heterogeneous.Folding (class FoldingWithIndex, class FoldlRecord, class HFoldlWithIndex, hfoldlWithIndex)
 import Prim.Row as Row
 import Prim.RowList (class RowToList)
 import Record.Builder (Builder)
 import Record.Builder as Builder
+import Type.Proxy (Proxy(..))
 
 -- Helper for type inference
 data SequenceRec (f :: Type -> Type)
@@ -21,7 +22,7 @@ instance sequenceRec_1 ::
   ) =>
   FoldingWithIndex
     (SequenceRec f)
-    (SProxy sym)
+    (Proxy sym)
     (f (Builder { | ra } { | rb }))
     (f a)
     (f (Builder { | ra } { | rc })) where
@@ -43,7 +44,7 @@ else instance sequenceRec_2 ::
   ) =>
   FoldingWithIndex
     (SequenceRec f)
-    (SProxy sym)
+    (Proxy sym)
     (f (Builder { | ra } { | rb }))
     { | x }
     (f (Builder { | ra } { | rc })) where
@@ -60,7 +61,7 @@ else instance sequenceRec_3 ::
   ) =>
   FoldingWithIndex
     (SequenceRec f)
-    (SProxy sym)
+    (Proxy sym)
     (f (Builder { | ra } { | rb }))
     x
     (f (Builder { | ra } { | rc })) where
@@ -91,7 +92,7 @@ instance hmapRec_1 ::
   ) =>
   FoldingWithIndex
     (HMapRec a b)
-    (SProxy sym)
+    (Proxy sym)
     (Builder { | ra } { | rb })
     a
     (Builder { | ra } { | rc }) where
@@ -112,7 +113,7 @@ else instance hmapRec_2 ::
   ) =>
   FoldingWithIndex
     (HMapRec a b)
-    (SProxy sym)
+    (Proxy sym)
     (Builder { | ra } { | rb })
     { | x }
     (Builder { | ra } { | rc }) where
@@ -128,7 +129,7 @@ else instance hmapRec_3 ::
   ) =>
   FoldingWithIndex
     (HMapRec a b)
-    (SProxy sym)
+    (Proxy sym)
     (Builder { | ra } { | rb })
     x
     (Builder { | ra } { | rc }) where
@@ -162,7 +163,7 @@ instance hmapKRec_1 ::
   ) =>
   FoldingWithIndex
     (HMapKRec f g)
-    (SProxy sym)
+    (Proxy sym)
     (Builder { | ra } { | rb })
     (f a)
     (Builder { | ra } { | rc }) where
@@ -183,7 +184,7 @@ else instance hmapKRec_2 ::
   ) =>
   FoldingWithIndex
     (HMapKRec f g)
-    (SProxy sym)
+    (Proxy sym)
     (Builder { | ra } { | rb })
     { | x }
     (Builder { | ra } { | rc }) where
@@ -199,7 +200,7 @@ else instance hmapKRec_3 ::
   ) =>
   FoldingWithIndex
     (HMapKRec f g)
-    (SProxy sym)
+    (Proxy sym)
     (Builder { | ra } { | rb })
     x
     (Builder { | ra } { | rc }) where

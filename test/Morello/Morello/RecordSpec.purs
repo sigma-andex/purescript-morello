@@ -55,7 +55,7 @@ spec =
                 }
             , h: 10
             }
-        (sequenceRec input) `shouldEqual` (Just expected)
+        (sequenceRec input :: Maybe SequenceOutput) `shouldEqual` (Just expected)
       it "should recursively sequence an invalid record" do
         let
           input :: SequenceInput

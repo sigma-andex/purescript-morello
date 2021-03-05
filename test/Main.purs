@@ -12,6 +12,6 @@ import Test.Spec.Reporter.Console (consoleReporter)
 import Test.Spec.Runner (runSpec)
 
 main :: Effect Unit
-main = launchAff_ $ runSpec [consoleReporter] do
+main = launchAff_ $ do
   specs <- discover "\\..*Spec"
   runSpec [consoleReporter] specs
