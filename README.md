@@ -49,7 +49,7 @@ convert =
 - 📜 **Declarative data conversion:** Define how your output data should look like instead of how to transform the input data
 - 🎒 **Applicative error accumulation:** Morello collects all validation erros instead of failing on the first error
 - 🪢 **Fully composable**: Cherries are just functions and therefore compose
-- 🔭 **Lens support**: Use [`profunctor-lenses`](https://github.com/purescript-contrib/purescript-profunctor-lenses) to zoom into your input data
+- 🔭 **Lens support**: Use [`lenses`](https://github.com/purescript-contrib/purescript-profunctor-lenses) to zoom into your input data
 - 🗺️ **Unicode support**: Define branches 🌱, cherries 🍒 and blossoms 🌸 using unicode
 
 ## Installation
