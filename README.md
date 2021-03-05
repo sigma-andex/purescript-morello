@@ -43,15 +43,25 @@ convert =
         }
     >>> blossom 
 ```
+
+## Features
+
+- 📰 **Declarative data conversion:** Define how your output data should look like instead of how to transform the input data
+- 🧺 **Applicative error accumulation:** Morello collects all validation erros instead of failing on the first error
+- 🪢 **Fully composable**: Cherries are just functions and therefore compose
+- 🔭 **Lens support**: Use [`profunctor-lenses`](https://github.com/purescript-contrib/purescript-profunctor-lenses) to zoom into your input data
+- 🗺️ **Unicode support**: Define branches 🌱, cherries 🍒 and blossoms 🌸 using unicode
+
+## Installation
+
+```bash
+spago install morello
+```
+
 ## Quick start
 
 See [quick start](./docs/quickstart.md)
 
-## Features
-
-- Declarative data conversion
-- Automatic, parallel error accumulation
-- Composable 
 
 ## Usage 
 
@@ -60,3 +70,8 @@ TBD
 ## Connecting the dots 
 
 This work is merely connecting the dots of the amazing Purescript language and its awesome ecosystem. A special shout-out to the contributors & maintainers of the [`profunctor-lenses`](https://github.com/purescript-contrib/purescript-profunctor-lenses), [`heterogeneous`](https://github.com/natefaubion/purescript-heterogeneous/) and [`validation`](https://github.com/purescript/purescript-validation) libraries. This library wouldn't have been possible without these.
+
+
+## License 
+
+Licenses under [MIT-0](LICENSE).
