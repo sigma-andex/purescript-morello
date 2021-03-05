@@ -4,7 +4,6 @@ import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Lens (AGetter', view)
 import Data.Profunctor.Strong ((&&&))
-import Data.Symbol (SProxy(..))
 import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V)
@@ -98,10 +97,10 @@ pick' _ lens validate = pick lens validate
 core :: forall f s a err b. Traversable f => AGetter' s (f a) -> ValidateE a err b -> ValidatorE s err (f b)
 core lens validate = ValidatorE (view lens >>> traverse validate)
 
-type Key r = SProxy r
+type Key r = Proxy r
 
 key :: forall r. Key r
-key = SProxy
+key = Proxy
 
 type Typ r = Proxy r 
 
