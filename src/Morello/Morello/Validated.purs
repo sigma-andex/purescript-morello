@@ -22,7 +22,6 @@ newtype ValidatorE input err a
 applyValidator :: forall input err a. input -> ValidatorE input err a -> ValidatedE err a
 applyValidator input (ValidatorE v) = v input
 
-
 invalid :: forall err r. err -> ValidatedE err r
 invalid = NonEmpty.singleton >>> V.invalid
 
