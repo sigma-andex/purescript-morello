@@ -8,7 +8,7 @@ import Data.Int (fromString)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), Validator, blossom, branch, cherry, core, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
+import Morello.Morello (Validate, Validated, ValidationError(..), Pick, blossom, branch, cherry, core, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
 import Morello.Morello.TestUtil (invalids)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -153,19 +153,19 @@ convert =
   branch
     >>> cherry
         { jobData:
-            { title: pick (professionL |> titleL) validateTitle :: Validator InputPerson Title
-            , salary: pick (professionL |> salaryL) validateSalary :: Validator InputPerson Salary
+            { title: pick (professionL |> titleL) validateTitle :: Pick InputPerson Title
+            , salary: pick (professionL |> salaryL) validateSalary :: Pick InputPerson Salary
             , jobType: Worker
             }
         , addresses:
             core (personL |> addressesL)
               ( branch
                   >>> cherry
-                      { zip: pick (zipL) validateZip :: Validator InputAddress Zip
+                      { zip: pick (zipL) validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
-              Validator InputPerson (Array Address)
+              Pick InputPerson (Array Address)
         }
     >>> blossom
 
@@ -177,24 +177,24 @@ convert2 =
             pick (professionL)
               ( branch
                   >>> cherry
-                      { title: pick (titleL) validateTitle :: Validator InputProfession Title
-                      , salary: pick (salaryL) validateSalary :: Validator InputProfession Salary
+                      { title: pick (titleL) validateTitle :: Pick InputProfession Title
+                      , salary: pick (salaryL) validateSalary :: Pick InputProfession Salary
                       , jobType: Worker
                       }
                   >>> blossom
               ) ::
-              Validator InputPerson JobData
+              Pick InputPerson JobData
         }
     >>> cherry
         { addresses:
             core (personL |> addressesL)
               ( branch
                   >>> cherry
-                      { zip: pick (zipL) validateZip :: Validator InputAddress Zip
+                      { zip: pick (zipL) validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
-              Validator InputPerson (Array Address)
+              Pick InputPerson (Array Address)
         }
     >>> blossom
 
@@ -203,8 +203,8 @@ convert3 =
   (🌱)
     >>> (🍒)
         { jobData:
-            { title: pick (professionL |> titleL) validateTitle :: Validator InputPerson Title
-            , salary: pick (professionL |> salaryL) validateSalary :: Validator InputPerson Salary
+            { title: pick (professionL |> titleL) validateTitle :: Pick InputPerson Title
+            , salary: pick (professionL |> salaryL) validateSalary :: Pick InputPerson Salary
             , jobType: Worker
             }
         }
@@ -213,11 +213,11 @@ convert3 =
             core (personL |> addressesL)
               ( branch
                   >>> cherry
-                      { zip: pick (zipL) validateZip :: Validator InputAddress Zip
+                      { zip: pick (zipL) validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
-              Validator InputPerson (Array Address)
+              Pick InputPerson (Array Address)
         }
     >>> (🌸)
 

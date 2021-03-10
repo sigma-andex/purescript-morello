@@ -9,13 +9,19 @@ import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V)
 import Heterogeneous.Folding (class FoldlRecord)
 import Morello.Morello.Record (HMapKRec, HSequenceRec, hmapKRec, hsequenceRec)
-import Morello.Morello.Validated (ValidatedE, ValidatorE(..), ValidateE, applyValidator, valid)
+import Morello.Morello.Validated (ValidatedE, ValidateE, valid)
 import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
 import Prim.Row (class Union)
 import Prim.RowList (class RowToList)
 import Record (union)
 import Record.Builder (Builder)
 import Type.Prelude (Proxy(..))
+
+newtype PickE input err a
+  = PickE (ValidateE input err a)
+
+applyPick :: forall input err a. input -> PickE input err a -> ValidatedE err a
+applyPick input (PickE v) = v input
 
 branch :: forall input err. input -> Tuple input (ValidatedE err {})
 branch = identity &&& const (valid {})
@@ -39,7 +45,7 @@ applyTemplate ::
   RowToList rthru rthruRL =>
   RowToList rout routRL =>
   FoldlRecord
-    (HMapKRec (ValidatorE input err) (V (NonEmptyArray err)))
+    (HMapKRec (PickE input err) (V (NonEmptyArray err)))
     (Builder (Record ()) (Record ()))
     rinRL
     rin
@@ -50,7 +56,7 @@ applyTemplate ::
     rthruRL
     rthru
     (V (NonEmptyArray err) (Builder (Record ()) (Record rout))) =>
-  (ValidatorE input err ~> ValidatedE err) -> { | rin } -> ValidatedE err { | rout }
+  (PickE input err ~> ValidatedE err) -> { | rin } -> ValidatedE err { | rout }
 applyTemplate nt = hmapKRec nt >>> hsequenceRec
 
 cherry ::
@@ -59,7 +65,7 @@ cherry ::
   RowToList rthru rthruRL =>
   RowToList rout routRL =>
   FoldlRecord
-    (HMapKRec (ValidatorE input err) (V (NonEmptyArray err)))
+    (HMapKRec (PickE input err) (V (NonEmptyArray err)))
     (Builder (Record ()) (Record ()))
     rinRL
     rin
@@ -77,7 +83,7 @@ cherry ::
 cherry rin = dual f
   where
   f :: input -> ValidatedE err { | rout }
-  f input = applyTemplate (applyValidator input) rin
+  f input = applyTemplate (applyPick input) rin
 
 infixr 8 cherry as 🍒
 
@@ -86,16 +92,17 @@ blossom = snd
 
 infixr 8 blossom as 🌸
 
-infixr 9 compose as |>
 
-pick :: forall s a err b. AGetter' s a -> ValidateE a err b -> ValidatorE s err b
-pick lens validate = ValidatorE (view lens >>> validate)
+pick :: forall s a err b. AGetter' s a -> ValidateE a err b -> PickE s err b
+pick lens validate = PickE (view lens >>> validate)
 
-pick' :: forall s a err b. Proxy s -> AGetter' s a -> ValidateE a err b -> ValidatorE s err b
+pick' :: forall s a err b. Proxy s -> AGetter' s a -> ValidateE a err b -> PickE s err b
 pick' _ lens validate = pick lens validate
 
-core :: forall f s a err b. Traversable f => AGetter' s (f a) -> ValidateE a err b -> ValidatorE s err (f b)
-core lens validate = ValidatorE (view lens >>> traverse validate)
+core :: forall f s a err b. Traversable f => AGetter' s (f a) -> ValidateE a err b -> PickE s err (f b)
+core lens validate = PickE (view lens >>> traverse validate)
+
+infixr 9 compose as |>
 
 type Key r = Proxy r
 
