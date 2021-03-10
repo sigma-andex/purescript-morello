@@ -34,10 +34,10 @@ convert =
             details : { 
                 title: 
                     -- ...picking data from the input record using a lens... 
-                    pick (professionL |> titleL ) validateTitle :: Validator PersonInput Title
+                    pick (professionL |> titleL ) validateTitle :: Pick PersonInput Title
               , salary:
                     -- ...and validating it using validators.
-                    pick (professionL |> salaryL ) validateSalary :: Validator PersonInput Salary
+                    pick (professionL |> salaryL ) validateSalary :: Pick PersonInput Salary
               , jobType : Worker
             }
         }

@@ -1,11 +1,12 @@
-module Morello.Morello.Error where
+module Morello.Morello.Simple where
 
 import Prelude (class Eq, class Show)
 
 import Data.Generic.Rep (class Generic)
 import Data.Eq.Generic (genericEq)
 import Data.Show.Generic (genericShow)
-import Morello.Morello.Validated (ValidateE, ValidatedE, ValidatorE) 
+import Morello.Morello.Validated (ValidateE, ValidatedE) 
+import Morello.Morello.Core (PickE)
 
 data ValidationError
   = FieldMissing String
@@ -20,4 +21,4 @@ instance eqValidationError :: Eq ValidationError where
 
 type Validated r = ValidatedE ValidationError r
 type Validate a b = ValidateE a ValidationError b 
-type Validator input a = ValidatorE input ValidationError a
+type Pick input a = PickE input ValidationError a

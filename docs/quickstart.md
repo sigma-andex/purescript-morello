@@ -46,10 +46,10 @@ convert =
             details : { -- by defining how your output format should look like
                 title: 
                     -- then pick data from your input by zooming in using the lens...
-                    pick (professionL |> titleL ) validateTitle :: Validator PersonInput Title
+                    pick (professionL |> titleL ) validateTitle :: Pick PersonInput Title
               , salary:
                     -- ...and validate using your validator
-                    pick (professionL |> salaryL ) validateSalary :: Validator PersonInput Salary
+                    pick (professionL |> salaryL ) validateSalary :: Pick PersonInput Salary
               -- you can also set constant data
               , jobType : Worker
             }

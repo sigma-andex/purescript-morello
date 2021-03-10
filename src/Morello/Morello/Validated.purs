@@ -1,7 +1,6 @@
 module Morello.Morello.Validated where
 
 import Prelude
-
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Array.NonEmpty as NonEmpty
 import Data.Validation.Semigroup (V)
@@ -14,13 +13,8 @@ type ValidatedE err r
 type ValidateE a err b
   = a -> ValidatedE err b
 
-type ValidateE' a err = ValidateE a err a 
-
-newtype ValidatorE input err a
-  = ValidatorE (input -> ValidatedE err a)
-
-applyValidator :: forall input err a. input -> ValidatorE input err a -> ValidatedE err a
-applyValidator input (ValidatorE v) = v input
+type ValidateE' a err
+  = ValidateE a err a
 
 invalid :: forall err r. err -> ValidatedE err r
 invalid = NonEmpty.singleton >>> V.invalid

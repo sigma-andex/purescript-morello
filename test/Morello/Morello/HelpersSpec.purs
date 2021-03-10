@@ -5,7 +5,7 @@ import Data.Show.Generic (genericShow)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), Validator, blossom, branch, cherry, invalid, key, pick, valid, (|>), as, asIs)
+import Morello.Morello (Validate, Validated, ValidationError(..), Pick, blossom, branch, cherry, invalid, key, pick, valid, (|>), as, asIs)
 import Morello.Morello.TestUtil (invalids)
 import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 import Test.Spec (Spec, describe, it)
@@ -37,9 +37,9 @@ convert =
   branch
     >>> cherry
         { title:
-            pick titleL (as Title) :: Validator PersonInput Title
+            pick titleL (as Title) :: Pick PersonInput Title
         , id:
-            pick idL asIs :: Validator PersonInput Int
+            pick idL asIs :: Pick PersonInput Int
         }
     >>> blossom
 

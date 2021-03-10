@@ -5,7 +5,7 @@ import Data.Show.Generic (genericShow)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), Validator, blossom, branch, cherry, invalid, key, pick, valid, (|>))
+import Morello.Morello (Validate, Validated, ValidationError(..), Pick, blossom, branch, cherry, invalid, key, pick, valid, (|>))
 import Morello.Morello.TestUtil (invalids)
 import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 import Test.Spec (Spec, describe, it)
@@ -57,9 +57,9 @@ convert =
             details : { -- by defining how your output format should look like
                 title: 
                     -- then pick data from your input and validate them 
-                    pick (professionL |> titleL ) validateTitle :: Validator PersonInput Title
+                    pick (professionL |> titleL ) validateTitle :: Pick PersonInput Title
               , salary:
-                    pick (professionL |> salaryL ) validateSalary :: Validator PersonInput Salary
+                    pick (professionL |> salaryL ) validateSalary :: Pick PersonInput Salary
               -- you can also set constant data
               , jobType : Worker
             }
