@@ -2,7 +2,9 @@
 
 A purescript library for cherry-picking 🍒 your data.
 
-The goal of this library is to make it super simple to validate input data and transform it into output data.
+*Ehh, wat ?*
+
+Morello is a library for making data transformation and validation super simple.
 
 ## tl;dr 
 Transform & validate your input data in a declarative way.
