@@ -1,9 +1,8 @@
 module Morello.Morello.HelpersSpec where
 
-import Data.Lens.Record (prop)
 import Data.Newtype (class Newtype)
-import Morello.Morello (Pick, Validated, as, asIs, blossom, branch, cherry, key, pick, valid)
 import Prelude (class Eq, class Show, Unit, (>>>))
+import Morello.Morello
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
@@ -24,18 +23,14 @@ derive newtype instance titleEq :: Eq Title
 type PersonOutput
   = { title :: Title, id :: Int }
 
-titleL = prop (key :: _ "title")
-
-idL = prop (key :: _ "id")
-
 convert :: PersonInput -> Validated PersonOutput
 convert =
   branch
     >>> cherry
         { title:
-            pick titleL (as Title) :: Pick PersonInput Title
+            pick' (key :: _ "title") (as Title) :: Pick PersonInput Title
         , id:
-            pick idL asIs :: Pick PersonInput Int
+            pick' (key :: _ "id") asIs :: Pick PersonInput Int
         }
     >>> blossom
 
