@@ -30,20 +30,19 @@ validateSalary n = invalid (FieldInvalid "Salary is too damn low")
 convert :: PersonInput -> Validated PersonOutput
 convert =
   branch 
-    >>> cherry 
-        -- ...by defining how your output data will look like...
-        { 
+    >>> cherry { 
+            -- ...by defining how your output data will look like...
             details : { 
                 title: 
                     -- ...picking data from the input record using a lens... 
-                    pick (professionL |> titleL ) validateTitle :: Pick PersonInput Title
+                    pick' (key :: _ "profession.title") validateTitle :: Pick PersonInput Title
               , salary:
                     -- ...and validating it using validators.
-                    pick (professionL |> salaryL ) validateSalary :: Pick PersonInput Salary
+                    pick' (key :: _ "profession.salary") validateSalary :: Pick PersonInput Salary
               , jobType : Worker
             }
         }
-    >>> blossom 
+    >>> blossom
 ```
 
 ## Features

@@ -1,11 +1,10 @@
 module Morello.Morello.MinimalSpec where
 
 import Data.Generic.Rep (class Generic)
-import Data.Show.Generic (genericShow)
-import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), Pick, blossom, branch, cherry, invalid, key, pick, valid, (|>))
+import Data.Show.Generic (genericShow)
+import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid)
 import Morello.Morello.TestUtil (invalids)
 import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 import Test.Spec (Spec, describe, it)
@@ -31,13 +30,6 @@ data JobType = Worker | Manager
 type PersonOutput
   = { details :: { title :: Title, salary :: Salary, jobType :: JobType } }
 
--- define lenses for accessing the input object
-professionL = prop (key :: _ "profession")
-
-titleL = prop (key :: _ "title")
-
-salaryL = prop (key :: _ "salary")
-
 
 -- write your (business logic) validation
 validateTitle :: Validate String Title
@@ -57,9 +49,9 @@ convert =
             details : { -- by defining how your output format should look like
                 title: 
                     -- then pick data from your input and validate them 
-                    pick (professionL |> titleL ) validateTitle :: Pick PersonInput Title
+                    pick' (key :: _ "profession.title") validateTitle :: Pick PersonInput Title
               , salary:
-                    pick (professionL |> salaryL ) validateSalary :: Pick PersonInput Salary
+                    pick' (key :: _ "profession.salary") validateSalary :: Pick PersonInput Salary
               -- you can also set constant data
               , jobType : Worker
             }

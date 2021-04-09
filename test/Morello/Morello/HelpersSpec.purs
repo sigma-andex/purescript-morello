@@ -1,13 +1,9 @@
 module Morello.Morello.HelpersSpec where
 
-import Data.Generic.Rep (class Generic)
-import Data.Show.Generic (genericShow)
 import Data.Lens.Record (prop)
-import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), Pick, blossom, branch, cherry, invalid, key, pick, valid, (|>), as, asIs)
-import Morello.Morello.TestUtil (invalids)
-import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
+import Morello.Morello (Pick, Validated, as, asIs, blossom, branch, cherry, key, pick, valid)
+import Prelude (class Eq, class Show, Unit, (>>>))
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 

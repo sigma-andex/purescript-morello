@@ -2,13 +2,14 @@ module Morello.Morello.Core where
 
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
-import Data.Lens (AGetter', view)
+import Data.Lens (AGetter', Forget, view)
+import Data.Lens.Barlow (class Barlow, class ConstructBarlow, class ParseSymbol, barlow)
 import Data.Profunctor.Strong ((&&&))
 import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V)
-import Heterogeneous.Folding (class FoldlRecord)
 import Heterogeneous.Extrablatt.Rec (HMapKRec, HSequenceRec, hmapKRec, hsequenceRec)
+import Heterogeneous.Folding (class FoldlRecord)
 import Morello.Morello.Validated (ValidatedE, ValidateE, valid)
 import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
 import Prim.Row (class Union)
@@ -92,24 +93,16 @@ blossom = snd
 
 infixr 8 blossom as 🌸
 
-
 pick :: forall s a err b. AGetter' s a -> ValidateE a err b -> PickE s err b
 pick lens validate = PickE (view lens >>> validate)
 
-pick' :: forall s a err b. Proxy s -> AGetter' s a -> ValidateE a err b -> PickE s err b
-pick' _ lens validate = pick lens validate
+pick' :: forall err output s sym tlist input. ParseSymbol sym tlist => ConstructBarlow tlist (Forget input) { | s } input => Proxy sym -> ValidateE input err output -> PickE { | s } err output
+pick' proxy = pick (barlow proxy)
 
 core :: forall f s a err b. Traversable f => AGetter' s (f a) -> ValidateE a err b -> PickE s err (f b)
 core lens validate = PickE (view lens >>> traverse validate)
 
+core' :: forall f input err output sym tlist s. Traversable f => ParseSymbol sym tlist => ConstructBarlow tlist (Forget (f input)) { | s } (f input) => Proxy sym -> ValidateE input err output -> PickE { | s } err (f output)
+core' proxy = core (barlow proxy)
+
 infixr 9 compose as |>
-
-type Key r = Proxy r
-
-key :: forall r. Key r
-key = Proxy
-
-type Typ r = Proxy r 
-
-typ :: forall r. Proxy r
-typ = Proxy
