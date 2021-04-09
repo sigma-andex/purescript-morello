@@ -1,9 +1,11 @@
 { name = "morello"
 , dependencies =
-  [ "console"
+  [ "barlow-lens"
+  , "console"
   , "debug"
   , "effect"
   , "heterogeneous"
+  , "heterogeneous-extrablatt"
   , "profunctor-lenses"
   , "psci-support"
   , "spec"
