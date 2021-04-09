@@ -10,6 +10,8 @@ Morello is a library for making data transformation and validation super simple.
 Transform & validate your input data in a declarative way.
 
 ```purescript
+import Morello.Morello
+
 -- Given an input model...
 type PersonInput = { profession :: { title :: String, salary :: Number } }
 

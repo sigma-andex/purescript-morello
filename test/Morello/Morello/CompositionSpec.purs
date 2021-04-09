@@ -1,14 +1,12 @@
 module Morello.Morello.CompositionSpec where
 
-import Prelude
-
+import Prelude (class Eq, class Show, Unit, discard, pure, show, ($), (&&), (<=), (<>), (>), (>>>))
 import Data.Generic.Rep (class Generic)
 import Data.Int (fromString)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
-import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid, (🌱), (🌸), (🍒))
-import Morello.Morello.Core (core')
+import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, core', invalid, key, pick', valid, (🌱), (🌸), (🍒))
 import Morello.Morello.TestUtil (invalids)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -116,7 +114,6 @@ validPerson =
       , salary: 200000.0
       }
   }
-
 
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")

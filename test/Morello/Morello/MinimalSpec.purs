@@ -4,7 +4,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
-import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid)
+import Morello.Morello
 import Morello.Morello.TestUtil (invalids)
 import Prelude (class Eq, class Show, Unit, discard, (>), (>>>))
 import Test.Spec (Spec, describe, it)
