@@ -3,12 +3,12 @@ module Morello.Morello.CompositionSpec where
 import Prelude
 
 import Data.Generic.Rep (class Generic)
-import Data.Show.Generic (genericShow)
 import Data.Int (fromString)
-import Data.Lens.Record (prop)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Morello.Morello (Validate, Validated, ValidationError(..), Pick, blossom, branch, cherry, core, invalid, key, pick, valid, (|>), (🌱), (🌸), (🍒))
+import Data.Show.Generic (genericShow)
+import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, invalid, key, pick', valid, (🌱), (🌸), (🍒))
+import Morello.Morello.Core (core')
 import Morello.Morello.TestUtil (invalids)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -117,18 +117,6 @@ validPerson =
       }
   }
 
-personL = prop (key :: _ "person")
-
-addressesL = prop (key :: _ "addresses")
-
-zipL = prop (key :: _ "zip")
-
-professionL = prop (key :: _ "profession")
-
-titleL = prop (key :: _ "title")
-
-salaryL = prop (key :: _ "salary")
-
 
 validateTitle :: Validate String Title
 validateTitle "Software Engineer" = invalid (FieldInvalid "Software Engineering is not a serious profession")
@@ -153,15 +141,15 @@ convert =
   branch
     >>> cherry
         { jobData:
-            { title: pick (professionL |> titleL) validateTitle :: Pick InputPerson Title
-            , salary: pick (professionL |> salaryL) validateSalary :: Pick InputPerson Salary
+            { title: pick' (key :: _ "profession.title") validateTitle :: Pick InputPerson Title
+            , salary: pick' (key :: _ "profession.salary") validateSalary :: Pick InputPerson Salary
             , jobType: Worker
             }
         , addresses:
-            core (personL |> addressesL)
+            core' (key :: _ "person.addresses")
               ( branch
                   >>> cherry
-                      { zip: pick (zipL) validateZip :: Pick InputAddress Zip
+                      { zip: pick' (key :: _ "zip") validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
@@ -174,11 +162,11 @@ convert2 =
   branch
     >>> cherry
         { jobData:
-            pick (professionL)
+            pick' (key :: _ "profession")
               ( branch
                   >>> cherry
-                      { title: pick (titleL) validateTitle :: Pick InputProfession Title
-                      , salary: pick (salaryL) validateSalary :: Pick InputProfession Salary
+                      { title: pick' (key :: _ "title") validateTitle :: Pick InputProfession Title
+                      , salary: pick' (key :: _ "salary") validateSalary :: Pick InputProfession Salary
                       , jobType: Worker
                       }
                   >>> blossom
@@ -187,10 +175,10 @@ convert2 =
         }
     >>> cherry
         { addresses:
-            core (personL |> addressesL)
+            core' (key :: _ "person.addresses")
               ( branch
                   >>> cherry
-                      { zip: pick (zipL) validateZip :: Pick InputAddress Zip
+                      { zip: pick' (key :: _ "zip") validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
@@ -203,17 +191,17 @@ convert3 =
   (🌱)
     >>> (🍒)
         { jobData:
-            { title: pick (professionL |> titleL) validateTitle :: Pick InputPerson Title
-            , salary: pick (professionL |> salaryL) validateSalary :: Pick InputPerson Salary
+            { title: pick' (key :: _ "profession.title") validateTitle :: Pick InputPerson Title
+            , salary: pick' (key :: _ "profession.salary") validateSalary :: Pick InputPerson Salary
             , jobType: Worker
             }
         }
     >>> (🍒)
         { addresses:
-            core (personL |> addressesL)
+            core' (key :: _ "person.addresses")
               ( branch
                   >>> cherry
-                      { zip: pick (zipL) validateZip :: Pick InputAddress Zip
+                      { zip: pick' (key :: _ "zip") validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
