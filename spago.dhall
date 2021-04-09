@@ -12,6 +12,18 @@
   , "spec-discovery"
   , "strings"
   , "validation"
+  , "aff"
+  , "arrays"
+  , "either"
+  , "foldable-traversable"
+  , "integers"
+  , "maybe"
+  , "newtype"
+  , "prelude"
+  , "profunctor"
+  , "record"
+  , "tuples"
+  , "typelevel-prelude"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
