@@ -63,8 +63,7 @@ spago install morello
 
 ## Quick start
 
-See [quick start](./docs/quickstart.md)
-
+See [MinimalSpec](./test/Morello/Morello/MinimalSpec.purs) for a short example that illustrates the basic functionality. 
 
 ## Usage 
 
