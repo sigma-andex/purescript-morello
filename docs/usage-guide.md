@@ -92,14 +92,14 @@ validateName name =
     else
         invalid (FieldInvalid "Product name is too short.")
 ```
-Now we got all the pieces to define how to `pick` data from our input and validate it:
+Now we got all the pieces to define how to `pickL  data from our input and validate it:
 
 ```purescript 
 convert :: InputProduct -> Validated Product
 convert = branch 
             >>> cherry {
                 name : 
-                    pick (nameL) validateName :: Pick InputProduct ProductName
+                    pickL (nameL) validateName :: Pick InputProduct ProductName
             }
             >>> blossom 
 ```

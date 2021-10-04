@@ -6,6 +6,6 @@ module Morello.Morello
   ) where
 
 import Data.Lens.Barlow
-import Morello.Morello.Core (applyTemplate, blossom, branch, cherry, dual, pick, pick', core, core', (|>), (🌱), (🌸), (🍒))
+import Morello.Morello.Core (applyTemplate, blossom, branch, cherry, dual, pickL  pick , core, core', (|>), (🌱), (🌸), (🍒))
 import Morello.Morello.Simple (Validated, Validate, Pick, ValidationError(..))
 import Morello.Morello.Validated (ValidateE, ValidatedE, invalid, valid, as, asIs)

@@ -3,7 +3,9 @@ module Morello.Morello.Core where
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Lens (AGetter', Forget, view)
-import Data.Lens.Barlow (class Barlow, class ConstructBarlow, class ParseSymbol, barlow)
+import Data.Lens.Barlow (barlow)
+import Data.Lens.Barlow.Parser (class ParseSymbol)
+import Data.Lens.Barlow.Construction (class ConstructBarlow)
 import Data.Profunctor.Strong ((&&&))
 import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
@@ -16,7 +18,7 @@ import Prim.Row (class Union)
 import Prim.RowList (class RowToList)
 import Record (union)
 import Record.Builder (Builder)
-import Type.Prelude (Proxy(..))
+import Type.Prelude (Proxy)
 
 newtype PickE input err a
   = PickE (ValidateE input err a)
@@ -93,16 +95,16 @@ blossom = snd
 
 infixr 8 blossom as 🌸
 
-pick :: forall s a err b. AGetter' s a -> ValidateE a err b -> PickE s err b
-pick lens validate = PickE (view lens >>> validate)
+pickL :: forall s a err b. AGetter' s a -> ValidateE a err b -> PickE s err b
+pickL lens validate = PickE (view lens >>> validate)
 
-pick' :: forall err output s sym tlist input. ParseSymbol sym tlist => ConstructBarlow tlist (Forget input) { | s } input => Proxy sym -> ValidateE input err output -> PickE { | s } err output
-pick' proxy = pick (barlow proxy)
+pick  :: forall s err output input sym lenses. ParseSymbol sym lenses => ConstructBarlow lenses (Forget input) s s input input => Proxy sym -> ValidateE input err output -> PickE s err output
+pick  proxy = pickL (barlow proxy)
 
 core :: forall f s a err b. Traversable f => AGetter' s (f a) -> ValidateE a err b -> PickE s err (f b)
 core lens validate = PickE (view lens >>> traverse validate)
 
-core' :: forall f input err output sym tlist s. Traversable f => ParseSymbol sym tlist => ConstructBarlow tlist (Forget (f input)) { | s } (f input) => Proxy sym -> ValidateE input err output -> PickE { | s } err (f output)
+core' :: forall f s input err output sym lenses. Traversable f => ParseSymbol sym lenses => ConstructBarlow lenses (Forget (f input)) s s (f input) (f input) => Proxy sym -> ValidateE input err output -> PickE s err (f output)
 core' proxy = core (barlow proxy)
 
 infixr 9 compose as |>

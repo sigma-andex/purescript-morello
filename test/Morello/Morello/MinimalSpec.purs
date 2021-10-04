@@ -53,12 +53,14 @@ convert :: PersonInput -> Validated PersonOutput
 convert =
   branch -- start with a branch
     >>> cherry
-        { -- then start cherry picking details:
-            { -- by defining how your output format should look like title:
-                -- then pick data from your input and validate them 
-                pick' (key :: _ "profession.title") validateTitle :: Pick PersonInput Title
+        { -- then start cherry picking 
+        details:
+            { -- by defining how your output format should look like 
+            title:
+                -- then pickL data from your input and validate them 
+                pick  (key :: _ "profession.title") validateTitle :: Pick PersonInput Title
             , salary:
-                pick' (key :: _ "profession.salary") validateSalary :: Pick PersonInput Salary
+                pick  (key :: _ "profession.salary") validateSalary :: Pick PersonInput Salary
             -- you can also set constant data
             , jobType: Worker
             }

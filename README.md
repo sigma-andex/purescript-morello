@@ -37,10 +37,10 @@ convert =
             details : { 
                 title: 
                     -- ...picking data from the input record using a lens... 
-                    pick' (key :: _ "profession.title") validateTitle :: Pick PersonInput Title
+                    pick  (key :: _ "profession.title") validateTitle :: Pick PersonInput Title
               , salary:
                     -- ...and validating it using validators.
-                    pick' (key :: _ "profession.salary") validateSalary :: Pick PersonInput Salary
+                    pick  (key :: _ "profession.salary") validateSalary :: Pick PersonInput Salary
               , jobType : Worker
             }
         }

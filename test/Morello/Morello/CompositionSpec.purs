@@ -6,7 +6,7 @@ import Data.Int (fromString)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
-import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, core', invalid, key, pick', valid, (🌱), (🌸), (🍒))
+import Morello.Morello (Pick, Validate, Validated, ValidationError(..), blossom, branch, cherry, core', invalid, key, pick , valid, (🌱), (🌸), (🍒))
 import Morello.Morello.TestUtil (invalids)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -138,15 +138,15 @@ convert =
   branch
     >>> cherry
         { jobData:
-            { title: pick' (key :: _ "profession.title") validateTitle :: Pick InputPerson Title
-            , salary: pick' (key :: _ "profession.salary") validateSalary :: Pick InputPerson Salary
+            { title: pick  (key :: _ "profession.title") validateTitle :: Pick InputPerson Title
+            , salary: pick  (key :: _ "profession.salary") validateSalary :: Pick InputPerson Salary
             , jobType: Worker
             }
         , addresses:
             core' (key :: _ "person.addresses")
               ( branch
                   >>> cherry
-                      { zip: pick' (key :: _ "zip") validateZip :: Pick InputAddress Zip
+                      { zip: pick  (key :: _ "zip") validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
@@ -159,11 +159,11 @@ convert2 =
   branch
     >>> cherry
         { jobData:
-            pick' (key :: _ "profession")
+            pick  (key :: _ "profession")
               ( branch
                   >>> cherry
-                      { title: pick' (key :: _ "title") validateTitle :: Pick InputProfession Title
-                      , salary: pick' (key :: _ "salary") validateSalary :: Pick InputProfession Salary
+                      { title: pick  (key :: _ "title") validateTitle :: Pick InputProfession Title
+                      , salary: pick  (key :: _ "salary") validateSalary :: Pick InputProfession Salary
                       , jobType: Worker
                       }
                   >>> blossom
@@ -175,7 +175,7 @@ convert2 =
             core' (key :: _ "person.addresses")
               ( branch
                   >>> cherry
-                      { zip: pick' (key :: _ "zip") validateZip :: Pick InputAddress Zip
+                      { zip: pick  (key :: _ "zip") validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
@@ -188,8 +188,8 @@ convert3 =
   (🌱)
     >>> (🍒)
         { jobData:
-            { title: pick' (key :: _ "profession.title") validateTitle :: Pick InputPerson Title
-            , salary: pick' (key :: _ "profession.salary") validateSalary :: Pick InputPerson Salary
+            { title: pick  (key :: _ "profession.title") validateTitle :: Pick InputPerson Title
+            , salary: pick  (key :: _ "profession.salary") validateSalary :: Pick InputPerson Salary
             , jobType: Worker
             }
         }
@@ -198,7 +198,7 @@ convert3 =
             core' (key :: _ "person.addresses")
               ( branch
                   >>> cherry
-                      { zip: pick' (key :: _ "zip") validateZip :: Pick InputAddress Zip
+                      { zip: pick  (key :: _ "zip") validateZip :: Pick InputAddress Zip
                       }
                   >>> blossom
               ) ::
