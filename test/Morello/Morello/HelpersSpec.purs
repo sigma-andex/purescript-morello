@@ -28,9 +28,9 @@ convert =
   branch
     >>> cherry
         { title:
-            pick' (key :: _ "title") (as Title) :: Pick PersonInput Title
+            pick (key :: _ "title") (as Title) :: Pick PersonInput Title
         , id:
-            pick' (key :: _ "id") asIs :: Pick PersonInput Int
+            pick (key :: _ "id") asIs :: Pick PersonInput Int
         }
     >>> blossom
 
