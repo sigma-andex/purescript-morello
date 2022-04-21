@@ -65,4 +65,3 @@ in  upstream
     , repo =
         "https://github.com/sigma-andex/purescript-heterogeneous-extrablatt.git"
     }
-  
