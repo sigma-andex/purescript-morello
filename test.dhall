@@ -10,5 +10,6 @@ in      conf
               , "spec-discovery"
               , "either"
               , "maybe"
+              , "integers"
               ]
         }
