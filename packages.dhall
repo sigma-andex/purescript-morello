@@ -9,3 +9,19 @@ in  upstream
     , repo =
         "https://github.com/sigma-andex/purescript-heterogeneous-extrablatt.git"
     }
+  with barlow-lens =
+    { dependencies =
+      [ "either"
+      , "foldable-traversable"
+      , "lists"
+      , "maybe"
+      , "newtype"
+      , "prelude"
+      , "profunctor"
+      , "profunctor-lenses"
+      , "tuples"
+      , "typelevel-prelude"
+      ]
+    , version = "v0.9.0"
+    , repo = "https://github.com/sigma-andex/purescript-barlow-lens.git"
+    }
