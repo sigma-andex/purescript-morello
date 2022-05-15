@@ -8,7 +8,7 @@
         "url": "https://github.com/sigma-andex/purescript-morello.git"
     },
     "ignore": [
-        "**/.*",
+        "test/**/.*",
         "node_modules",
         "bower_components",
         "output"
