@@ -7,14 +7,11 @@ import Data.Validation.Semigroup (V)
 import Data.Validation.Semigroup as V
 import Data.Newtype (class Newtype, wrap)
 
-type ValidatedE err r
-  = V (NonEmptyArray err) r
+type ValidatedE err r = V (NonEmptyArray err) r
 
-type ValidateE a err b
-  = a -> ValidatedE err b
+type ValidateE a err b = a -> ValidatedE err b
 
-type ValidateE' a err
-  = ValidateE a err a
+type ValidateE' a err = ValidateE a err a
 
 invalid :: forall err r. err -> ValidatedE err r
 invalid = NonEmpty.singleton >>> V.invalid

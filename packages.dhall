@@ -1,13 +1,13 @@
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.0-20220513/packages.dhall
-        sha256:1ed784f37ae6131d99acd542d058d5ce39954ccaacc3adba5cc7cf1549d2bffa
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.4-20221108/packages.dhall
+        sha256:c7a61f5937f09a2fa5e06c1857aea835645f78856469fdb99ae036a5ba768e41
 
 in  upstream
-  with heterogeneous-extrablatt =
-    { dependencies = [ "heterogeneous", "prelude", "record" ]
-    , version = "v0.2.1"
-    , repo =
-        "https://github.com/sigma-andex/purescript-heterogeneous-extrablatt.git"
+  with record-studio =
+    { dependencies =
+      [ "heterogeneous", "lists", "prelude", "record", "typelevel-prelude" ]
+    , version = "v1.0.1"
+    , repo = "https://github.com/rowtype-yoga/purescript-record-studio.git"
     }
   with barlow-lens =
     { dependencies =

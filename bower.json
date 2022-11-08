@@ -18,7 +18,7 @@
         "purescript-barlow-lens": "https://github.com/sigma-andex/purescript-barlow-lens.git#v0.9.0",
         "purescript-foldable-traversable": "^v6.0.0",
         "purescript-heterogeneous": "^v0.6.0",
-        "purescript-heterogeneous-extrablatt": "https://github.com/sigma-andex/purescript-heterogeneous-extrablatt.git#v0.2.1",
+        "purescript-record-studio": "https://github.com/rowtype-yoga/purescript-record-studio.git#v1.0.1",
         "purescript-newtype": "^v5.0.0",
         "purescript-prelude": "^v6.0.0",
         "purescript-profunctor": "^v6.0.0",

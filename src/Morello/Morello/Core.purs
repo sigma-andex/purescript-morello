@@ -3,7 +3,7 @@ module Morello.Morello.Core where
 import Control.Semigroupoid (compose)
 import Data.Array.NonEmpty (NonEmptyArray)
 import Data.Lens (AGetter', Forget, view)
-import Data.Lens.Barlow (class Barlow, barlow)
+import Data.Lens.Barlow (barlow)
 import Data.Lens.Barlow.Construction (class ConstructBarlow)
 import Data.Lens.Barlow.Parser (class ParseSymbol)
 import Data.Lens.Barlow.Types (TList)
@@ -11,7 +11,6 @@ import Data.Profunctor.Strong ((&&&))
 import Data.Traversable (class Traversable, traverse)
 import Data.Tuple (Tuple(..), fst, snd, uncurry)
 import Data.Validation.Semigroup (V)
-import Heterogeneous.Extrablatt.Rec (HMapKRec, HSequenceRec, hmapKRec, hsequenceRec)
 import Heterogeneous.Folding (class FoldlRecord)
 import Morello.Morello.Validated (ValidatedE, ValidateE, valid)
 import Prelude (type (~>), const, identity, (<#>), (<$>), (<*>), (>>>))
@@ -19,7 +18,8 @@ import Prim.Row (class Union)
 import Prim.RowList (class RowToList)
 import Record (union)
 import Record.Builder (Builder)
-import Type.Prelude (Proxy(..))
+import Record.Studio (MapRecordKind, SequenceRecord, mapRecordKind, sequenceRecord)
+import Type.Prelude (Proxy)
 
 newtype PickE input err a = PickE (ValidateE input err a)
 
@@ -48,13 +48,13 @@ applyTemplate
   => RowToList rthru rthruRL
   => RowToList rout routRL
   => FoldlRecord
-       (HMapKRec (PickE input err) (V (NonEmptyArray err)))
+       (MapRecordKind (PickE input err) (V (NonEmptyArray err)))
        (Builder (Record ()) (Record ()))
        rinRL
        rin
        (Builder (Record ()) (Record rthru))
   => FoldlRecord
-       (HSequenceRec (V (NonEmptyArray err)))
+       (SequenceRecord (V (NonEmptyArray err)))
        (V (NonEmptyArray err) (Builder (Record ()) (Record ())))
        rthruRL
        rthru
@@ -62,7 +62,7 @@ applyTemplate
   => (PickE input err ~> ValidatedE err)
   -> { | rin }
   -> ValidatedE err { | rout }
-applyTemplate nt = hmapKRec nt >>> hsequenceRec
+applyTemplate nt = mapRecordKind nt >>> sequenceRecord
 
 cherry
   :: forall input err from to rin rinRL rthru rthruRL rout routRL
@@ -70,13 +70,13 @@ cherry
   => RowToList rthru rthruRL
   => RowToList rout routRL
   => FoldlRecord
-       (HMapKRec (PickE input err) (V (NonEmptyArray err)))
+       (MapRecordKind (PickE input err) (V (NonEmptyArray err)))
        (Builder (Record ()) (Record ()))
        rinRL
        rin
        (Builder (Record ()) (Record rthru))
   => FoldlRecord
-       (HSequenceRec (V (NonEmptyArray err)))
+       (SequenceRecord (V (NonEmptyArray err)))
        (V (NonEmptyArray err) (Builder (Record ()) (Record ())))
        rthruRL
        rthru
